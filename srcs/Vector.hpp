@@ -78,18 +78,31 @@ public:
 	void				clear();
 };
 
+// 기본생성자, allocator로 기본 용량만큼 할당받고 끝
 template <typename T, typename Alloc>
-Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(10), _size(0)
+Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
 {
 	_begin = _allocator.allocate(_capacity);
 }
 
+// n만큼 공간을 할당받고 val로 할당받은 공간에 construct 한다.
 template <typename T, typename Alloc>
-Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _capacity(n), _size(n)
+Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _capacity(n), _size(n), _allocator(alloc)
 {
+	size_type		i;
+
 	_begin = _allocator.allocate(_capacity);
+	i = 0;
+	while (i < n)
+	{
+		push_back(val);
+		++i;
+	}
 }
 
+// 이터레이터 생성자: 이터레이터를 돌면서 값을 집어넣는다.
+// Vector<int>(10, 30) 	같은 경우 이 함수로 들어오면 안된다.
+// 레퍼런스 참고
 template <typename T, typename Alloc>
 	template <typename InputIterator>
 Vector<T, Alloc>::Vector (InputIterator first, InputIterator last, const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
@@ -102,17 +115,30 @@ Vector<T, Alloc>::Vector (InputIterator first, InputIterator last, const allocat
 	}
 }
 
+// 복사생성자
 template <typename T, typename Alloc>
 Vector<T, Alloc>::Vector(const Vector &copy) : _capacity(copy._capacity), _size(copy._size), _allocator(copy._allocator)
 {
+	size_type		i;
+
+	i = 0;
+	_begin = _allocator.allocate(_capacity);
+	while (i < _size)
+	{
+		push_back(copy[i]);
+		++i;
+	}
 }
 
+// 소멸자
 template <typename T, typename Alloc>
 Vector<T, Alloc>::~Vector()
 {
-	_allocator.destroy(_begin);
+	clear();
 	_allocator.deallocate(_begin, _capacity);
 }
+
+/* Iterator */
 
 template <typename T, typename Alloc>
 VectorIterator<T>		Vector<T, Alloc>::begin()
@@ -138,12 +164,16 @@ ReverseVectorIterator<T>	Vector<T, Alloc>::rend()
 	return (_begin - 1);
 }
 
+/* Capacity */
+
+// 현재 벡터의 사이즈 반환
 template <typename T, typename Alloc>
 Vector<T, Alloc>::size_type		Vector<T, Alloc>::size() const
 {
 	return (_size);
 }
 
+// 할당 가능한 최대 크기 반환
 template <typename T, typename Alloc>
 Vector<T, Alloc>::size_type		Vector<T, Alloc>::max_size() const
 {
@@ -151,18 +181,34 @@ Vector<T, Alloc>::size_type		Vector<T, Alloc>::max_size() const
 }
 
 // 크기 조절
+// n이 현재 사이즈보다 작다면, 그 밖의 요소는 제거
+// 크다면, val이 추가됨
+// 현재 용량보다 n이 크다면 재할당
 template <typename T, typename Alloc>
 void		Vector<T, Alloc>::resize(size_type n, value_type val)
 {
+	size_type		i;
 
+	if (_size > n)
+	{
+		while (_size > n)
+			pop_back();
+	}
+	else if (_size < n)
+	{
+		while (_size < n)
+			push_back(val);
+	}
 }
 
+// 컨테이너에 할당된 메모리 크기 반환
 template <typename T, typename Alloc>
 Vector<T, Alloc>::size_type			Vector<T, Alloc>::capacity() const
 {
 	return (_capacity);
 }
 
+// 컨테이너가 비어있는지 확인
 template <typename T, typename Alloc>
 bool				Vector<T, Alloc>::empty() const
 {
@@ -172,14 +218,31 @@ bool				Vector<T, Alloc>::empty() const
 		return (false);
 }
 
-// capacity 재설정
+// 벡터 용량이 최소한 n 개의 요소를 포함하기에 충분하도록 요청합니다.
+// n이 현재 벡터 용량보다 크면이 함수는 컨테이너가 스토리지를 다시 할당하여 용량을 n (또는 그 이상)으로 늘립니다.
+// 다른 모든 경우에는 함수 호출로 인해 재 할당이 발생하지 않으며 벡터 용량에 영향을주지 않습니다.
+// 이 함수는 벡터 크기에 영향을주지 않으며 요소를 변경할 수 없습니다.
 template <typename T, typename Alloc>
 void				Vector<T, Alloc>::reserve(size_type n)
 {
+	if (n > _capacity)
+	{
+		pointer		temp;
 
+		temp = _allocator.allocate(n);
+		for (size_t i = 0; i < _size; i++)
+			_allocator.construct(temp + i, *(temp + i));
+
+		clear();
+		_allocator.deallocate(_begin, _capacity);
+
+		_begin = temp;
+		_capacity = n;
+	}
 }
 
-//
+/* Element Access */
+
 template <typename T, typename Alloc>
 Vector<T, Alloc>::reference				Vector<T, Alloc>::operator[](size_type n)
 {
@@ -254,29 +317,36 @@ Vector<T, Alloc>::const_reference				Vector<T, Alloc>::back() const
 
 /* Modifier */
 
+// 벡터에 새 내용을 할당하고 현재 내용을 바꾸고 그에 따라 크기를 수정합니다.
+// 범위 버전 (1)에서 새 콘텐츠는 첫 번째와 마지막 사이의 범위에있는 각 요소에서 동일한 순서로 구성된 요소입니다.
+// 채우기 버전 (2)에서 새 내용은 n 개의 요소이며 각각 val의 복사본으로 초기화됩니다.
+// 재 할당이 발생하면 필요한 스토리지가 내부 할당자를 사용하여 할당됩니다.
+// 호출 전에 컨테이너에 보유 된 모든 요소는 소멸되고 새로 구성된 요소로 대체됩니다 (요소 할당이 발생하지 않음).
+// 이렇게하면 새 벡터 크기가 현재 벡터 용량을 초과하는 경우에만 할당 된 저장 공간이 자동으로 재 할당됩니다.
 template <typename T, typename Alloc>
 	template <typename InputIterator>
 void				Vector<T, Alloc>::assign(InputIterator first, InputIterator last)
 {
-	
+	clear();
+	while (first != last)
+	{
+		push_back(*first);
+		++first;
+	}
 }
-
 
 template <typename T, typename Alloc>
 void				Vector<T, Alloc>::assign(size_type n, const value_type &val)
 {
-	if (n > _capacity)
+	clear();
+	for (size_type i = 0; i < n; ++i)
 	{
-		pointer		temp;
-
-		temp = _begin;
-	}
-	else
-	{
-gi
+		push_back(val);
 	}
 }
 
+// value를 뒤에 추가
+// 만약 _capacity보다 _size가 커지면 재할당
 template <typename T, typename Alloc>
 void					Vector<T, Alloc>::push_back(const value_type &value)
 {
@@ -287,30 +357,12 @@ void					Vector<T, Alloc>::push_back(const value_type &value)
 	}
 	else
 	{
-		pointer		temp;
-
-		temp = _begin;
-		_begin = _allocator.allocate(_capacity * 2);
-
-		for (size_t i = 0; i < _size; i++)
-		{
-			_allocator.construct(_begin + i, *(temp + i));
-		}
-		_allocator.construct((_begin + _size), value);
-
-		_allocator.destroy(temp);
-		_allocator.deallocate(temp, _size);
-		
-		++_size;
-		_capacity = _capacity * 2;
-		
-		// 재할당
-		// 복사
-		// 해제
-		// 기타 변수 변경				
+		reserve(_capacity * 2);
+		push_back(value);
 	}
 }
 
+// 맨뒤에 요소를 제거하고 _size 감소
 template <typename T, typename Alloc>
 void				Vector<T, Alloc>::pop_back()
 {
@@ -352,9 +404,16 @@ template <typename T, typename Alloc>
 void				Vector<T, Alloc>::swap(Vector& x)
 {}
 
+// _size만큼 모든 원소를 destroy
 template <typename T, typename Alloc>
 void				Vector<T, Alloc>::clear()
-{}
+{
+	while (_size)
+	{
+		_allocator.destroy(_begin + _size - 1);
+		--_size;
+	}
+}
 
 
 
