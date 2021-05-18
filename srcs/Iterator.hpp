@@ -32,6 +32,36 @@ public:
 	typedef Reference	reference;
 };
 
+template <typename Category, typename T, typename Distance = ptrdiff_t, typename Pointer = T*, typename Reference = T&>
+class BaseIterator : public Iterator<Category, T, Distance>
+{
+protected:
+	Pointer			_element;
+
+public:
+	BaseIterator();
+	BaseIterator(const BaseIterator &copy);
+	BaseIterator	&operator=(const BaseIterator &ref);
+};
+
+template <typename Category, typename T, typename Distance, typename Pointer, typename Reference>
+BaseIterator<Category, T, Distance, Pointer, Reference>::BaseIterator() : _element(0)
+{
+}
+
+template <typename Category, typename T, typename Distance, typename Pointer, typename Reference>
+BaseIterator<Category, T, Distance, Pointer, Reference>::BaseIterator(const BaseIterator &copy) : _element(copy._element)
+{
+}
+
+template <typename Category, typename T, typename Distance, typename Pointer, typename Reference>
+BaseIterator<Category, T, Distance, Pointer, Reference>	&BaseIterator<Category, T, Distance, Pointer, Reference>::operator=(const BaseIterator &ref)
+{
+	_element = ref._element;
+	return (*this);
+}
+
+/*
 template<typename _Iterator>
 struct iterator_traits
 {
@@ -63,5 +93,6 @@ struct iterator_traits<const _Tp*>
 	typedef const _Tp*                  pointer;
 	typedef const _Tp&                  reference;
 };
+*/
 
 #endif 
