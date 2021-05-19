@@ -5,89 +5,109 @@
 # include "VectorIterator.hpp"
 # include "ReverseVectorIterator.hpp"
 
-template < typename T, typename Alloc = std::allocator<T> >
-class Vector
+namespace ft
 {
-public:
-	// cplusplus에 정의되어 있는 type
-	typedef T											value_type;
-	typedef Alloc										allocator_type;
-	typedef typename allocator_type::reference			reference;
-	typedef typename allocator_type::const_reference	const_reference;
-	typedef typename allocator_type::pointer			pointer;
-	typedef typename allocator_type::const_pointer		const_pointer;
-	typedef VectorIterator<T>							iterator;
-	typedef const VectorIterator<T>						const_iterator;
-	typedef ReverseVectorIterator<T>					reverse_iterator;
-	typedef const ReverseVectorIterator<T>				const_reverse_iterator;
-	typedef ptrdiff_t									difference_type;
-	typedef size_t										size_type;
+	template < typename T, typename Alloc = std::allocator<T> >
+	class Vector
+	{
+	public:
+		// cplusplus에 정의되어 있는 type
+		typedef T											value_type;
+		typedef Alloc										allocator_type;
+		typedef typename allocator_type::reference			reference;
+		typedef typename allocator_type::const_reference	const_reference;
+		typedef typename allocator_type::pointer			pointer;
+		typedef typename allocator_type::const_pointer		const_pointer;
+		typedef VectorIterator<T>							iterator;
+		typedef const VectorIterator<T>						const_iterator;
+		typedef ReverseVectorIterator<T>					reverse_iterator;
+		typedef const ReverseVectorIterator<T>				const_reverse_iterator;
+		typedef ptrdiff_t									difference_type;
+		typedef size_t										size_type;
 
-private:
-	// allocator_type	_allocator;
-	std::allocator<T>	_allocator;
-	pointer				_begin;
-	size_t				_capacity;
-	size_t				_size;
+	private:
+		// allocator_type	_allocator;
+		std::allocator<T>	_allocator; // 자동완성때문에 잠깐 바꿔놓음 위에꺼로 해야됨
+		pointer				_begin;
+		size_t				_capacity;
+		size_t				_size;
 
-public:
-	explicit Vector(const allocator_type& alloc = allocator_type());
-	explicit Vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type());
+	public:
+		explicit Vector(const allocator_type& alloc = allocator_type());
+		explicit Vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type());
 
-	template <typename InputIterator>
-	Vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
-	Vector(const Vector &);
+		template <typename InputIterator>
+		Vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
+		Vector(const Vector &);
 
-	~Vector();
+		~Vector();
 
-	Vector				&operator=(const Vector &copy);
-	iterator			begin();
-	iterator			end();
-	reverse_iterator	rbegin();
-	reverse_iterator	rend();
+		Vector				&operator=(const Vector &copy);
+		iterator			begin();
+		iterator			end();
+		reverse_iterator	rbegin();
+		reverse_iterator	rend();
 
-	size_type			size() const;
-	size_type			max_size() const;
-	void				resize(size_type n, value_type val = value_type());
-	size_type			capacity() const;
-	bool				empty() const;
-	void				reserve(size_type n);
+		size_type			size() const;
+		size_type			max_size() const;
+		void				resize(size_type n, value_type val = value_type());
+		size_type			capacity() const;
+		bool				empty() const;
+		void				reserve(size_type n);
 
-	reference			operator[](size_type n);
-	const_reference		operator[](size_type n) const;
-	reference			at(size_type n);
-	const_reference		at(size_type n) const;
-	reference			front();
-	const_reference		front() const;
-	reference			back();
-	const_reference		back() const;
+		reference			operator[](size_type n);
+		const_reference		operator[](size_type n) const;
+		reference			at(size_type n);
+		const_reference		at(size_type n) const;
+		reference			front();
+		const_reference		front() const;
+		reference			back();
+		const_reference		back() const;
 
 
-	template <typename InputIterator>
-	void				assign(InputIterator first, InputIterator last);
-	void				assign(size_type n, const value_type &val);
-	void				push_back(const value_type &value);
-	void				pop_back();
-	iterator			insert(iterator position, const value_type &val);
-	void				insert(iterator position, size_type n, const value_type& val);
-	template <class InputIterator>
-	void				insert(iterator position, InputIterator first, InputIterator last);
-	iterator			erase(iterator position);
-	iterator			erase(iterator first, iterator last);
-	void				swap(Vector& x);
-	void				clear();
-};
+		template <typename InputIterator>
+		void				assign(InputIterator first, InputIterator last);
+		void				assign(size_type n, const value_type &val);
+		void				push_back(const value_type &value);
+		void				pop_back();
+		iterator			insert(iterator position, const value_type &val);
+		void				insert(iterator position, size_type n, const value_type& val);
+		template <class InputIterator>
+		void				insert(iterator position, InputIterator first, InputIterator last);
+		iterator			erase(iterator position);
+		iterator			erase(iterator first, iterator last);
+		void				swap(Vector& x);
+		void				clear();
+	
+	private:
+		template <typename X>
+		void				private_vector(X first, X last);
+		template <>
+		void				private_vector<int>(int n, int val)
+		{
+			size_type		i;
+
+			_begin = _allocator.allocate(_capacity);
+			i = 0;
+			while (i < static_cast<size_type>(n))
+			{
+				push_back(static_cast<value_type>(val));
+				++i;
+			}
+		};
+	};
+}
 
 // 기본생성자, allocator로 기본 용량만큼 할당받고 끝
 template <typename T, typename Alloc>
-Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
 {
 	_begin = _allocator.allocate(_capacity);
 }
 
 // n만큼 공간을 할당받고 val로 할당받은 공간에 construct 한다.
 template <typename T, typename Alloc>
-Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _capacity(n), _size(n), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _capacity(n), _size(n), _allocator(alloc)
 {
 	size_type		i;
 
@@ -100,12 +120,9 @@ Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_typ
 	}
 }
 
-// 이터레이터 생성자: 이터레이터를 돌면서 값을 집어넣는다.
-// Vector<int>(10, 30) 	같은 경우 이 함수로 들어오면 안된다.
-// 레퍼런스 참고
 template <typename T, typename Alloc>
-	template <typename InputIterator>
-Vector<T, Alloc>::Vector (InputIterator first, InputIterator last, const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
+	template <typename X>
+void		ft::Vector<T, Alloc>::private_vector(X first, X last)
 {
 	_begin = _allocator.allocate(_capacity);
 	while (first != last)
@@ -115,15 +132,25 @@ Vector<T, Alloc>::Vector (InputIterator first, InputIterator last, const allocat
 	}
 }
 
+// 이터레이터 생성자: 이터레이터를 돌면서 값을 집어넣는다.
+// Vector<int>(10, 30) 	같은 경우 이 함수로 들어오면 안된다.
+// 레퍼런스 참고
+template <typename T, typename Alloc>
+	template <typename InputIterator>
+ft::Vector<T, Alloc>::Vector(InputIterator first, InputIterator last, const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
+{
+	private_vector(first, last);
+}
+
 // 복사생성자
 template <typename T, typename Alloc>
-Vector<T, Alloc>::Vector(const Vector &copy) : _capacity(copy._capacity), _size(copy._size), _allocator(copy._allocator)
+ft::Vector<T, Alloc>::Vector(const Vector &copy) : _capacity(copy._capacity), _size(0), _allocator(copy._allocator)
 {
 	size_type		i;
 
 	i = 0;
 	_begin = _allocator.allocate(_capacity);
-	while (i < _size)
+	while (i < copy._size)
 	{
 		push_back(copy[i]);
 		++i;
@@ -132,7 +159,7 @@ Vector<T, Alloc>::Vector(const Vector &copy) : _capacity(copy._capacity), _size(
 
 // 소멸자
 template <typename T, typename Alloc>
-Vector<T, Alloc>::~Vector()
+ft::Vector<T, Alloc>::~Vector()
 {
 	clear();
 	_allocator.deallocate(_begin, _capacity);
@@ -141,25 +168,25 @@ Vector<T, Alloc>::~Vector()
 /* Iterator */
 
 template <typename T, typename Alloc>
-VectorIterator<T>		Vector<T, Alloc>::begin()
+VectorIterator<T>		ft::Vector<T, Alloc>::begin()
 {
 	return (_begin);
 }
 
 template <typename T, typename Alloc>
-VectorIterator<T>		Vector<T, Alloc>::end()
+VectorIterator<T>		ft::Vector<T, Alloc>::end()
 {
 	return (_begin + _size);
 }
 
 template <typename T, typename Alloc>
-ReverseVectorIterator<T>	Vector<T, Alloc>::rbegin()
+ReverseVectorIterator<T>	ft::Vector<T, Alloc>::rbegin()
 {
 	return (_begin + _size - 1);
 }
 
 template <typename T, typename Alloc>
-ReverseVectorIterator<T>	Vector<T, Alloc>::rend()
+ReverseVectorIterator<T>	ft::Vector<T, Alloc>::rend()
 {
 	return (_begin - 1);
 }
@@ -168,14 +195,14 @@ ReverseVectorIterator<T>	Vector<T, Alloc>::rend()
 
 // 현재 벡터의 사이즈 반환
 template <typename T, typename Alloc>
-Vector<T, Alloc>::size_type		Vector<T, Alloc>::size() const
+typename ft::Vector<T, Alloc>::size_type		ft::Vector<T, Alloc>::size() const
 {
 	return (_size);
 }
 
 // 할당 가능한 최대 크기 반환
 template <typename T, typename Alloc>
-Vector<T, Alloc>::size_type		Vector<T, Alloc>::max_size() const
+typename ft::Vector<T, Alloc>::size_type		ft::Vector<T, Alloc>::max_size() const
 {
 	return (_allocator.max_size());
 }
@@ -185,7 +212,7 @@ Vector<T, Alloc>::size_type		Vector<T, Alloc>::max_size() const
 // 크다면, val이 추가됨
 // 현재 용량보다 n이 크다면 재할당
 template <typename T, typename Alloc>
-void		Vector<T, Alloc>::resize(size_type n, value_type val)
+void		ft::Vector<T, Alloc>::resize(size_type n, value_type val)
 {
 	size_type		i;
 
@@ -203,14 +230,14 @@ void		Vector<T, Alloc>::resize(size_type n, value_type val)
 
 // 컨테이너에 할당된 메모리 크기 반환
 template <typename T, typename Alloc>
-Vector<T, Alloc>::size_type			Vector<T, Alloc>::capacity() const
+typename ft::Vector<T, Alloc>::size_type		ft::Vector<T, Alloc>::capacity() const
 {
 	return (_capacity);
 }
 
 // 컨테이너가 비어있는지 확인
 template <typename T, typename Alloc>
-bool				Vector<T, Alloc>::empty() const
+bool				ft::Vector<T, Alloc>::empty() const
 {
 	if (_size == 0)
 		return (true);
@@ -223,7 +250,7 @@ bool				Vector<T, Alloc>::empty() const
 // 다른 모든 경우에는 함수 호출로 인해 재 할당이 발생하지 않으며 벡터 용량에 영향을주지 않습니다.
 // 이 함수는 벡터 크기에 영향을주지 않으며 요소를 변경할 수 없습니다.
 template <typename T, typename Alloc>
-void				Vector<T, Alloc>::reserve(size_type n)
+void				ft::Vector<T, Alloc>::reserve(size_type n)
 {
 	if (n > _capacity)
 	{
@@ -231,8 +258,7 @@ void				Vector<T, Alloc>::reserve(size_type n)
 
 		temp = _allocator.allocate(n);
 		for (size_t i = 0; i < _size; i++)
-			_allocator.construct(temp + i, *(temp + i));
-
+			_allocator.construct(temp + i, *(_begin + i));
 		clear();
 		_allocator.deallocate(_begin, _capacity);
 
@@ -244,73 +270,67 @@ void				Vector<T, Alloc>::reserve(size_type n)
 /* Element Access */
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::reference				Vector<T, Alloc>::operator[](size_type n)
+typename ft::Vector<T, Alloc>::reference				ft::Vector<T, Alloc>::operator[](size_type n)
+{
+	return (*(_begin + n));
+}
+
+template <typename T, typename Alloc>
+typename ft::Vector<T, Alloc>::const_reference				ft::Vector<T, Alloc>::operator[](size_type n) const
+{
+	return (*(_begin + n));
+}
+
+template <typename T, typename Alloc>
+typename ft::Vector<T, Alloc>::reference				ft::Vector<T, Alloc>::at(size_type n)
 {
 	if (empty() || n >= _size)
-		throw (std::out_of_range());
+		throw (std::out_of_range("_M_range_check"));
 	else
 		return (*(_begin + n));
 }
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::const_reference				Vector<T, Alloc>::operator[](size_type n) const
+typename ft::Vector<T, Alloc>::const_reference				ft::Vector<T, Alloc>::at(size_type n) const
 {
 	if (empty() || n >= _size)
-		throw (std::out_of_range());
+		throw (std::out_of_range("_M_range_check"));
 	else
 		return (*(_begin + n));
 }
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::reference				Vector<T, Alloc>::at(size_type n)
-{
-	if (n >= _size)
-		throw (std::out_of_range());
-	else
-		return (*(_begin + n));
-}
-
-template <typename T, typename Alloc>
-Vector<T, Alloc>::const_reference				Vector<T, Alloc>::at(size_type n) const
+typename ft::Vector<T, Alloc>::reference				ft::Vector<T, Alloc>::front()
 {
 	if (empty())
-		throw (std::out_of_range());
-	else
-		return (*(_begin + n));
-}
-
-template <typename T, typename Alloc>
-Vector<T, Alloc>::reference				Vector<T, Alloc>::front()
-{
-	if (empty())
-		throw (std::out_of_range());
+		throw (std::out_of_range("empty"));
 	else
 		return (*(_begin));
 }
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::const_reference				Vector<T, Alloc>::front() const
+typename ft::Vector<T, Alloc>::const_reference				ft::Vector<T, Alloc>::front() const
 {
 	if (empty())
-		throw (std::out_of_range());
+		throw (std::out_of_range("empty"));
 	else
 		return (*(_begin));
 }
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::reference				Vector<T, Alloc>::back()
+typename ft::Vector<T, Alloc>::reference				ft::Vector<T, Alloc>::back()
 {
 	if (empty())
-		throw (std::out_of_range());
+		throw (std::out_of_range("empty"));
 	else
 		return (*(_begin + _size - 1));
 }
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::const_reference				Vector<T, Alloc>::back() const
+typename ft::Vector<T, Alloc>::const_reference				ft::Vector<T, Alloc>::back() const
 {
 	if (empty())
-		throw (std::out_of_range());
+		throw (std::out_of_range("empty"));
 	else
 		return (*(_begin + _size - 1));
 }
@@ -325,7 +345,7 @@ Vector<T, Alloc>::const_reference				Vector<T, Alloc>::back() const
 // 이렇게하면 새 벡터 크기가 현재 벡터 용량을 초과하는 경우에만 할당 된 저장 공간이 자동으로 재 할당됩니다.
 template <typename T, typename Alloc>
 	template <typename InputIterator>
-void				Vector<T, Alloc>::assign(InputIterator first, InputIterator last)
+void				ft::Vector<T, Alloc>::assign(InputIterator first, InputIterator last)
 {
 	clear();
 	while (first != last)
@@ -336,7 +356,7 @@ void				Vector<T, Alloc>::assign(InputIterator first, InputIterator last)
 }
 
 template <typename T, typename Alloc>
-void				Vector<T, Alloc>::assign(size_type n, const value_type &val)
+void				ft::Vector<T, Alloc>::assign(size_type n, const value_type &val)
 {
 	clear();
 	for (size_type i = 0; i < n; ++i)
@@ -348,7 +368,7 @@ void				Vector<T, Alloc>::assign(size_type n, const value_type &val)
 // value를 뒤에 추가
 // 만약 _capacity보다 _size가 커지면 재할당
 template <typename T, typename Alloc>
-void					Vector<T, Alloc>::push_back(const value_type &value)
+void					ft::Vector<T, Alloc>::push_back(const value_type &value)
 {
 	if (_size < _capacity)
 	{
@@ -364,7 +384,7 @@ void					Vector<T, Alloc>::push_back(const value_type &value)
 
 // 맨뒤에 요소를 제거하고 _size 감소
 template <typename T, typename Alloc>
-void				Vector<T, Alloc>::pop_back()
+void				ft::Vector<T, Alloc>::pop_back()
 {
 	if (_size > 0)
 	{
@@ -373,40 +393,111 @@ void				Vector<T, Alloc>::pop_back()
 	}
 }
 
+// 벡터는 지정된 위치의 요소 앞에 새 요소를 삽입하여 확장되며 삽입 된 요소 수만큼 컨테이너 크기를 효과적으로 늘립니다.
+// 이렇게하면 새 벡터 크기가 현재 벡터 용량을 초과하는 경우에만 할당 된 저장 공간이 자동으로 재 할당됩니다.
+// 벡터는 배열을 기본 저장소로 사용하기 때문에 벡터 끝이 아닌 위치에 요소를 삽입하면 컨테이너가 위치 이후에 있던 모든 요소를 ​​새 위치로 재배치합니다. 
+// 이것은 일반적으로 다른 종류의 시퀀스 컨테이너 (예 : list 또는 forward_list)에 의해 동일한 작업에 대해 수행되는 작업에 비해 비효율적 인 작업입니다.
+// 매개 변수는 삽입되는 요소 수와 초기화되는 값을 결정합니다.
 template <typename T, typename Alloc>
-Vector<T, Alloc>::iterator			Vector<T, Alloc>::insert(iterator position, const value_type &val)
+typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::insert(iterator position, const value_type &val)
 {
-	*position = val;
+	value_type	temp;
+
+	if (position != _begin + _size) // 끝이 아니라면
+	{
+		temp = *position;
+		*position = val;
+		++position;
+		insert(position, temp);
+	}
+	else
+	{
+		push_back(val);
+	}
+	return (_begin);
 }
 
+// 
 template <typename T, typename Alloc>
-void				Vector<T, Alloc>::insert(iterator position, size_type n, const value_type& val)
+void				ft::Vector<T, Alloc>::insert(iterator position, size_type n, const value_type& val)
 {
-	
+	for (size_type i = 0; i < n; ++i)
+	{
+		insert(position, val);
+	}
 }
 
 template <typename T, typename Alloc>
 	template <class InputIterator>
-void				Vector<T, Alloc>::insert(iterator position, InputIterator first, InputIterator last)
+void				ft::Vector<T, Alloc>::insert(iterator position, InputIterator first, InputIterator last)
 {
-	while ()
+	while (first != last)
+	{
+		insert(position, *first);
+		++position;
+		++first;
+	}
+}
+
+
+template <typename T, typename Alloc>
+typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator position)
+{
+	size_type	i;
+	pointer		temp;
+	iterator	iter;
+	iterator	end;
+
+	i = 0;
+	temp = _allocator.allocate(_capacity);
+	iter = begin();
+	end = end();
+	while (iter != end)
+	{
+		if (iter != position)
+		{
+			_allocator.construct(temp + i, *iter);
+			++i;
+		}
+		++iter;
+	}
+	clear();
+	_allocator.deallocate(_begin, _capacity);
+	_begin = temp;
 }
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::iterator			Vector<T, Alloc>::erase(iterator position)
-{}
+typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator first, iterator last)
+{
+	while (first != last)
+	{
+		erase(first);
+		++first;
+	}
+}
+
+template <typename T>
+static void			swap(T &x, T &y)
+{
+	T	temp;
+
+	temp = x;
+	x = y;
+	y = temp;
+}
 
 template <typename T, typename Alloc>
-Vector<T, Alloc>::iterator			Vector<T, Alloc>::erase(iterator first, iterator last)
-{}
-
-template <typename T, typename Alloc>
-void				Vector<T, Alloc>::swap(Vector& x)
-{}
+void				ft::Vector<T, Alloc>::swap(Vector& x)
+{
+	swap(_allocator, x._allocator);
+	swap(_begin, x._begin);
+	swap(_capacity, x._capacity);
+	swap(_size, x._size);
+}
 
 // _size만큼 모든 원소를 destroy
 template <typename T, typename Alloc>
-void				Vector<T, Alloc>::clear()
+void				ft::Vector<T, Alloc>::clear()
 {
 	while (_size)
 	{
@@ -414,7 +505,5 @@ void				Vector<T, Alloc>::clear()
 		--_size;
 	}
 }
-
-
 
 #endif

@@ -2,38 +2,50 @@
 #include <vector>
 #include "Vector.hpp"
 
-// normal case
-void	test01()
+template <typename T>
+void	show_vector(ft::Vector<T> &vec)
 {
-	int						i = 0;
-	Vector<int>				vec;
-	Vector<int>::iterator	iter;
-	Vector<int>::iterator	end;
+	for (typename ft::Vector<T>::iterator it = vec.begin(); it != vec.end(); ++it)
+		std::cout << ' ' << *it;
+	std::cout << " [size: " << vec.size() << ", capacity: " << vec.capacity() << "]\n";
+}
 
-	vec.push_back(1);
-	vec.push_back(2);
-	vec.push_back(3);
-	iter = vec.begin();
-	end = vec.end();
+// Constructor Test
+void	constructor_test()
+{
+	ft::Vector<int> first;                                // empty vector of ints
+	ft::Vector<int> second(4, 100);                       // four ints with value 100
+	ft::Vector<int> third(second.begin() + 1,second.end());  // iterating through second
+	ft::Vector<int> fourth(third);                       // a copy of third
+	std::cout << '\n';
 
-	while (iter != end)
-	{
-		std::cout << *iter << "\n";
-		iter++;
-		i++;
-	}
-	// std::cout << *(iter + 12131230) << "\n";
-	if (i != 3)
-		throw ("test01\n");
+	// the iterator constructor can also be used to construct from arrays:
+	int myints[] = {16,2,77,29};
+	ft::Vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
+
+	std::cout << "first:";
+	show_vector(first);
+
+	std::cout << "second:";
+	show_vector(second);
+
+	std::cout << "third:";
+	show_vector(third);
+
+	std::cout << "fourth:";
+	show_vector(fourth);
+
+	std::cout << "fifth:";
+	show_vector(fifth);
 }
 
 // empty case
 void	test02()
 {
 	int						i;
-	Vector<int>				vec;
-	Vector<int>::iterator	iter;
-	Vector<int>::iterator	end;
+	ft::Vector<int>				vec;
+	ft::Vector<int>::iterator	iter;
+	ft::Vector<int>::iterator	end;
 
 	iter = vec.begin();
 	end = vec.end();
@@ -50,9 +62,9 @@ void	test02()
 void	test03()
 {
 	int						i;
-	Vector<int>				vec;
-	Vector<int>::iterator	iter;
-	Vector<int>::iterator	end;
+	ft::Vector<int>				vec;
+	ft::Vector<int>::iterator	iter;
+	ft::Vector<int>::iterator	end;
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -102,9 +114,9 @@ void	test01_ex()
 void	test04()
 {
 	int						i;
-	Vector<int>				vec;
-	Vector<int>::iterator	iter;
-	Vector<int>::iterator	end = vec.end();
+	ft::Vector<int>				vec;
+	ft::Vector<int>::iterator	iter;
+	ft::Vector<int>::iterator	end = vec.end();
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -179,11 +191,11 @@ void	reverse_iterator_test()
 	std::vector<int>::iterator				iter;
 	std::vector<int>::iterator				end;
 
-	Vector<int>								o_vec;
-	Vector<int>::reverse_iterator			o_riter;
-	Vector<int>::reverse_iterator			o_rend;
-	Vector<int>::iterator					o_iter;
-	Vector<int>::iterator					o_end;
+	ft::Vector<int>								o_vec;
+	ft::Vector<int>::reverse_iterator			o_riter;
+	ft::Vector<int>::reverse_iterator			o_rend;
+	ft::Vector<int>::iterator					o_iter;
+	ft::Vector<int>::iterator					o_end;
 
 	vec.push_back(1);
 	vec.push_back(2);
@@ -223,12 +235,7 @@ int		main()
 {
 	try
 	{
-		// test01();
-		// test02();
-		// test03();
-		// test04();
-		// test04_ex();
-		reverse_iterator_test();
+		constructor_test();
 	}
 	catch(const char *err)
 	{

@@ -62,6 +62,14 @@
 		"sstream": "cpp",
 		"stdexcept": "cpp",
 		"system_error": "cpp",
-		"utility": "cpp"
+		"utility": "cpp",
+		"__tree": "cpp",
+		"deque": "cpp",
+		"fstream": "cpp",
+		"iomanip": "cpp",
+		"map": "cpp",
+		"queue": "cpp",
+		"stack": "cpp",
+		"filesystem": "cpp"
 	}
 }
