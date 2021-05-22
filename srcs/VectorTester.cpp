@@ -39,22 +39,37 @@ void	constructor_test()
 	show_vector(fifth);
 }
 
-// empty case
-void	test02()
+class	Pos
+{
+public:
+	int		_x;
+	int		_y;
+	Pos(int x, int y)
+	{
+		_x = x;
+		_y = y;
+	};
+	~Pos()
+	{};
+};
+
+// Class test
+void	class_test()
 {
 	int						i;
-	ft::Vector<int>				vec;
-	ft::Vector<int>::iterator	iter;
-	ft::Vector<int>::iterator	end;
+	ft::Vector<Pos>				vec;
+	ft::Vector<Pos>::iterator	iter;
+	ft::Vector<Pos>::iterator	end;
 
+	vec.push_back(Pos(3, 5));
+	vec.push_back(Pos(2, 4));
 	iter = vec.begin();
 	end = vec.end();
 
 	while (iter != end)
 	{
-		std::cout << *iter << "\n";
+		std::cout << (*iter)._x << ", " << (*iter)._y << "\n";
 		iter++;
-		throw ("test02\n");
 	}
 }
 
@@ -91,10 +106,6 @@ void	test01_ex()
 	std::vector<int>::iterator		iter;
 	std::vector<int>::iterator		end;
 
-	// for (i = 0; i < 10; i++)
-	// {
-	// 	vec.push_back(i);
-	// }
 	vec.push_back(1);
 	i = 0;
 	iter = vec.begin();
@@ -106,8 +117,6 @@ void	test01_ex()
 		i++;
 	}
 	std::cout << *iter << "\n";
-	// if (i != 10)
-	// 	throw ("test03\n");
 }
 
 // capacity exceed case
@@ -235,7 +244,8 @@ int		main()
 {
 	try
 	{
-		constructor_test();
+		// constructor_test();
+		class_test();
 	}
 	catch(const char *err)
 	{

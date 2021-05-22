@@ -1,5 +1,5 @@
-#ifndef LIST_ITERATOR_HPP
-# define LIST_ITERATOR_HPP
+#ifndef REVERSE_LIST_ITERATOR_HPP
+# define REVERSE_LIST_ITERATOR_HPP
 
 # include "Iterator.hpp"
 # include "Node.hpp"

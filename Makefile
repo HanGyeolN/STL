@@ -34,5 +34,5 @@ bonus :
 
 re : fclean all
 
-test :
-	clang++ srcs/VectorTester.cpp -o VectorTester
+vector_test :
+	clang++ tester/VectorTester.cpp -I srcs -o VectorTester
