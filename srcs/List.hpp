@@ -738,7 +738,10 @@ namespace ft
 // comp
 //     Binary predicate that, taking two values of the same type than those contained in the list, returns true if the first argument is considered to go before the second in the strict weak ordering it defines, and false otherwise.
 //     This shall be a function pointer or a function object.
-		void merge (list& x);
+		void merge (list& x)
+		{
+
+		}
 
 		template <class Compare>
 		void merge (list& x, Compare comp);
@@ -757,7 +760,23 @@ namespace ft
 // comp
 //     Binary predicate that, taking two values of the same type of those contained in the list, returns true if the first argument goes before the second argument in the strict weak ordering it defines, and false otherwise.
 //     This shall be a function pointer or a function object.
-		void sort();
+		void sort()
+		{
+			iterator		iter;
+			iterator		iter2;
+
+			iter = begin();
+			while (iter != end())
+			{
+				iter2 = iter + 1;
+				while (iter2 != end())
+				{
+					if (iter < iter - 1)
+						swap(*iter, *(iter - 1));
+					++iter;
+				}
+			}
+		}
 
 		template <class Compare>
 		void sort (Compare comp);
