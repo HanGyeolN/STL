@@ -58,7 +58,7 @@ public:
 
 	ListIterator		&operator++()
 	{
-		this->_element = this->_element->_next;
+		this->_element = this->_element->_prev;
 		return (*this);
 	}
 
@@ -66,13 +66,13 @@ public:
 	{
 		ListIterator	tmp(*this);
 
-		this->_element = this->_element->_next;
+		this->_element = this->_element->_prev;
 		return (tmp);
 	}
 	
 	ListIterator		&operator--()
 	{
-		this->_element = this->_element->_prev;
+		this->_element = this->_element->_next;
 		return (*this);
 	}
 
@@ -80,7 +80,7 @@ public:
 	{
 		ListIterator	tmp(*this);
 
-		this->_element = this->_element->_prev;
+		this->_element = this->_element->_next;
 		return (tmp);
 	}
 };
