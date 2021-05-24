@@ -749,7 +749,9 @@ namespace ft
 // Sort elements in container
 // Sorts the elements in the list, altering their position within the container.
 
-// The sorting is performed by applying an algorithm that uses either operator< (in version (1)) or comp (in version (2)) to compare elements. This comparison shall produce a strict weak ordering of the elements (i.e., a consistent transitive comparison, without considering its reflexiveness).
+// The sorting is performed by applying an algorithm that uses either operator< (in version (1)) or comp (in version (2)) to compare elements. 
+
+// This comparison shall produce a strict weak ordering of the elements (i.e., a consistent transitive comparison, without considering its reflexiveness).
 
 // The resulting order of equivalent elements is stable: i.e., equivalent elements preserve the relative order they had before the call.
 
@@ -758,33 +760,86 @@ namespace ft
 // Parameters
 
 // comp
-//     Binary predicate that, taking two values of the same type of those contained in the list, returns true if the first argument goes before the second argument in the strict weak ordering it defines, and false otherwise.
+//     Binary predicate that, taking two values of the same type of those contained in the list, 
+//		returns true if the first argument goes before the second argument in the strict weak ordering it defines, and false otherwise.
 //     This shall be a function pointer or a function object.
 		void sort()
 		{
 			iterator		iter;
 			iterator		iter2;
+			pointer			temp;
 
 			iter = begin();
-			while (iter != end())
+			while (iter != end() - 1)
 			{
 				iter2 = iter + 1;
 				while (iter2 != end())
 				{
-					if (iter < iter - 1)
-						swap(*iter, *(iter - 1));
-					++iter;
+					if (iter < iter2)
+					{
+						iter->_prev->_next = iter2._element;
+						iter->_next->_prev = iter2._element;
+						iter2->_prev->_next = iter._element;
+						iter2->_next->_prev = iter._element;
+						temp = iter->_next;
+						iter->_next = iter2->_next;
+						iter2->_next = temp;
+					}
+					++iter2;
 				}
+				++iter;
 			}
 		}
 
 		template <class Compare>
-		void sort (Compare comp);
+		void sort (Compare comp)
+		{
+			iterator		iter;
+			iterator		iter2;
+			pointer			temp;
+
+			iter = begin();
+			while (iter != end() - 1)
+			{
+				iter2 = iter + 1;
+				while (iter2 != end())
+				{
+					if (comp(*iter, *iter2))
+					{
+						iter->_prev->_next = iter2._element;
+						iter->_next->_prev = iter2._element;
+						iter2->_prev->_next = iter._element;
+						iter2->_next->_prev = iter._element;
+						temp = iter->_next;
+						iter->_next = iter2->_next;
+						iter2->_next = temp;
+					}
+					++iter2;
+				}
+				++iter;
+			}
+		}
 
 
 // Reverse the order of elements
 // Reverses the order of the elements in the list container.
-		void reverse();
+		void reverse()
+		{
+			iterator	iter;
+			pointer		temp;
+
+			iter = begin();
+			while (iter != end())
+			{
+				temp = iter->_prev;
+				iter->_prev = iter->_next;
+				iter->_next = temp;
+				++iter;
+			}
+			temp = iter->_prev;
+			iter->_prev = iter->_next;
+			iter->_next = temp;
+		}
 
 // Get allocator
 // Returns a copy of the allocator object associated with the list container.
@@ -796,7 +851,10 @@ namespace ft
 // The allocator.
 
 // Member type allocator_type is the type of the allocator used by the container, defined in list as an alias of its second template parameter (Alloc).
-		allocator_type get_allocator() const;
+		allocator_type get_allocator() const
+		{
+			return (_allocator);
+		}
 
 
 		template <class T, class Alloc>
