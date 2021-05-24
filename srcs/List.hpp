@@ -570,6 +570,8 @@ namespace ft
 			_size += x.size();
 			
 			x.clear();
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 		void splice (iterator position, list& x, iterator i); // single element (2)
@@ -583,6 +585,8 @@ namespace ft
 			i->_next = position._element;
 			position->_prev = i._element;
 			++_size;
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 		void splice (iterator position, list& x, iterator first, iterator last); // element range (3)
@@ -605,6 +609,8 @@ namespace ft
 			}
 			x._size -= size;
 			_size += size;
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 // Remove elements with specific value
@@ -634,6 +640,8 @@ namespace ft
 				}
 				++iter;
 			}
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 
@@ -665,6 +673,8 @@ namespace ft
 				}
 				++iter;
 			}
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 // Remove duplicate values
@@ -722,7 +732,9 @@ namespace ft
 
 // This effectively removes all the elements in x (which becomes empty), and inserts them into their ordered position within container (which expands in size by the number of elements transferred). The operation is performed without constructing nor destroying any element: they are transferred, no matter whether x is an lvalue or an rvalue, or whether the value_type supports move-construction or not.
 
-// The template versions with two parameters (2), have the same behavior, but take a specific predicate (comp) to perform the comparison operation between elements. This comparison shall produce a strict weak ordering of the elements (i.e., a consistent transitive comparison, without considering its reflexiveness).
+// The template versions with two parameters (2), have the same behavior, but take a specific predicate (comp) to perform the comparison operation between elements. This comparison shall produce a strict weak ordering of the elements 
+
+// (i.e., a consistent transitive comparison, without considering its reflexiveness).
 
 // This function requires that the list containers have their elements already ordered by value (or by comp) before the call. For an alternative on unordered lists, see list::splice.
 
@@ -740,11 +752,44 @@ namespace ft
 //     This shall be a function pointer or a function object.
 		void merge (list& x)
 		{
+			iterator	iter;
+			iterator	iter2;
 
+			sort();
+			x.sort();
+			if (_size == 0 || x.size() == 0)
+				return ;
+			iter = x.begin();
+			iter2 = begin();
+			while (iter != x.end())
+			{
+				while (*iter < *iter2 || iter2 == end())
+					++iter2;
+				splice(iter2, x, iter);
+				++iter;
+			}
 		}
 
 		template <class Compare>
-		void merge (list& x, Compare comp);
+		void merge (list& x, Compare comp)
+		{
+			iterator	iter;
+			iterator	iter2;
+
+			sort();
+			x.sort();
+			if (_size == 0 || x.size() == 0)
+				return ;
+			iter = x.begin();
+			iter2 = begin();
+			while (iter != x.end())
+			{
+				while (comp(*iter, *iter2) || iter2 == end())
+					++iter2;
+				splice(iter2, x, iter);
+				++iter;
+			}
+		}
 
 // Sort elements in container
 // Sorts the elements in the list, altering their position within the container.
@@ -789,6 +834,8 @@ namespace ft
 				}
 				++iter;
 			}
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 		template <class Compare>
@@ -818,6 +865,8 @@ namespace ft
 				}
 				++iter;
 			}
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 
@@ -839,6 +888,8 @@ namespace ft
 			temp = iter->_prev;
 			iter->_prev = iter->_next;
 			iter->_next = temp;
+			_begin = _end->_next;
+			_last = _end->_prev;
 		}
 
 // Get allocator

@@ -30,6 +30,9 @@ namespace ft
 	template <class T, class Container = ft::Vector<T> >
 	class Stack
 	{
+	private:
+		Container				_container;
+
 	public:
 		typedef T				value_type;
 		typedef Container		container_type;
@@ -39,7 +42,8 @@ namespace ft
 // Construct stack
 // Constructs a stack container adaptor object.
 
-// A container adaptor keeps internally a container object as data. This container object is a copy of the ctnr argument passed to the constructor, if any, otherwise it is an empty container.
+// A container adaptor keeps internally a container object as data. 
+// This container object is a copy of the ctnr argument passed to the constructor, if any, otherwise it is an empty container.
 
 // Parameters
 
@@ -51,15 +55,25 @@ namespace ft
 //     Alloc shall be a type for which uses_allocator::value is true (for other types, the constructor does not even participate in overload resolution).
 // x
 //     A stack of the same type (i.e., with the same template arguments, T and Container).
-		explicit stack (const container_type& ctnr = container_type());
+		explicit stack (const container_type& ctnr = container_type())
+		{
+			_container = ctnr;
+		}
 
 
 //Test whether container is empty
 // Returns whether the stack is empty: i.e. whether its size is zero.
 
 // This member function effectively calls member empty of the underlying container object.
-		bool				empty() const;
-		size_type			size() const;
+		bool				empty() const
+		{
+			return (_container.empty());
+		}
+
+		size_type			size() const
+		{
+			return (_container.size());
+		}
 
 // Access next element
 // Returns a reference to the top element in the stack.
@@ -73,8 +87,14 @@ namespace ft
 
 // Return value
 // A reference to the top element in the stack.
-		value_type			&top();
-		const value_type	&top() const;
+		value_type			&top()
+		{
+			return (_container.back());
+		}
+		const value_type	&top() const
+		{
+			return (_container.back());
+		}
 
 // Insert element
 // Inserts a new element at the top of the stack, above its current top element. The content of this new element is initialized to a copy of val.
@@ -90,7 +110,10 @@ namespace ft
 
 // Return value
 // none
-		void push (const value_type& val);
+		void push (const value_type& val)
+		{
+			_container.push_back(val);
+		}
 
 // Remove top element
 // Removes the element on top of the stack, effectively reducing its size by one.
@@ -107,7 +130,10 @@ namespace ft
 // Return value
 // none
 
-		void pop();
+		void pop()
+		{
+			_container.pop_back();
+		}
 
 // Relational operators for stack
 // Performs the appropriate comparison operation between lhs and rhs.
@@ -124,36 +150,41 @@ namespace ft
 // true if the condition holds, and false otherwise.
 
 		template <class T, class Container>
-		bool operator== (const stack<T,Container>& lhs, const stack<T,Container>& rhs);
-
-
-		template <class T, class Container>
-		bool operator!= (const stack<T,Container>& lhs, const stack<T,Container>& rhs);
-
-		template <class T, class Container>
-		bool operator<  (const stack<T,Container>& lhs, const stack<T,Container>& rhs);
-
+		bool operator== (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		{
+			return (lhs == rhs);
+		}
 
 		template <class T, class Container>
-		bool operator<= (const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		bool operator!= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		{
+			return (lhs != rhs);
+		}
 
 		template <class T, class Container>
-		bool operator>  (const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		bool operator<  (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		{
+			return (lhs < rhs);
+		}
 
 		template <class T, class Container>
-		bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs);
+		bool operator<= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		{
+			return (lhs <= rhs);
+		}
 
-		~Stack();
+		template <class T, class Container>
+		bool operator>  (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		{
+			return (lhs > rhs);
+		}
+
+		template <class T, class Container>
+		bool operator>= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		{
+			return (lhs >= rhs);
+		}
 	};
 }
-
-Stack::Stack(/* args */)
-{
-}
-
-Stack::~Stack()
-{
-}
-
 
 #endif
