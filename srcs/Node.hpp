@@ -8,8 +8,8 @@ class Node
 {
 public:
 	T				_data;
-	Node			*_next;
-	Node			*_prev;
+	Node<T>			*_next;
+	Node<T>			*_prev;
 
 public:
 // Constructor
@@ -19,15 +19,12 @@ public:
 // Destructor
 	~Node();
 // etc
-	Node	&operator=(const Node &);
-	Node	&operator++();
-	Node	&operator--();
+	Node<T>		&operator=(const Node &);
 };
 
 template <typename T>
 Node<T>::Node() : _data(0), _next(0), _prev(0)
 {
-	std::cout << "Node constructor called." << std::endl; // test
 }
 
 template <typename T>
@@ -43,7 +40,6 @@ Node<T>::Node(const Node<T> &copy) : _data(copy._data), _next(copy._next), _prev
 template <typename T>
 Node<T>::~Node()
 {
-	std::cout << "Node destructor called." << std::endl; // test
 }
 
 template <typename T>
@@ -53,18 +49,6 @@ Node<T>		&Node<T>::operator=(const Node<T> &ref)
 	_next = ref._next;
 	_prev = ref._prev;
 	return (*this);
-}
-
-template <typename T>
-Node<T>		&Node<T>::operator++()
-{
-	return *(this->_next);
-}
-
-template <typename T>
-Node<T>		&Node<T>::operator--()
-{
-	return *(this->_prev);
 }
 
 #endif

@@ -1,7 +1,9 @@
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
+# include <iostream>
 # include <memory>
+# include <algorithm>
 # include "VectorIterator.hpp"
 # include "ReverseVectorIterator.hpp"
 
@@ -42,7 +44,20 @@ namespace ft
 
 		~Vector();
 
-		Vector				&operator=(const Vector &copy);
+		Vector				&operator=(const Vector &copy)
+		{
+			clear();
+			size_type		i;
+
+			i = 0;
+			_begin = _allocator.allocate(_capacity);
+			while (i < copy._size)
+			{
+				push_back(copy[i]);
+				++i;
+			}
+			return (*this);
+		}
 		iterator			begin();
 		iterator			end();
 		reverse_iterator	rbegin();
@@ -79,41 +94,35 @@ namespace ft
 		void				swap(Vector& x);
 		void				clear();
 
-		template <class T, class Alloc>
-		bool operator== (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator==(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 		{
 			if (lhs.size() == rhs.size())
-				return (std::equal(lhs.begin(), lhs.end(), rhs.begin()));
+				return (equal(lhs.begin(), lhs.end(), rhs.begin()));
 			else
 				return (false);
 		}
 
-		template <class T, class Alloc>
-		bool operator!= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator!=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 		{
 			return (!(lhs == rhs));
 		}
 
-		template <class T, class Alloc>
-		bool operator<  (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator<(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 		{
 			return (std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 		}
 
-		template <class T, class Alloc>
-		bool operator<= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator<=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 		{
 			return (!(rhs < lhs));
 		}
 
-		template <class T, class Alloc>
-		bool operator>  (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator>(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 		{
 			return (rhs < lhs);
 		}
 
-		template <class T, class Alloc>
-		bool operator>= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
+		friend bool operator>=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 		{
 			return (!(lhs < rhs));
 		}
@@ -121,6 +130,7 @@ namespace ft
 	private:
 		template <typename X>
 		void				private_vector(X first, X last);
+
 		template <>
 		void				private_vector<int>(int n, int val)
 		{
@@ -133,13 +143,68 @@ namespace ft
 				push_back(static_cast<value_type>(val));
 				++i;
 			}
-		};
+		}
+
+		
+
+		void				insert_private(iterator position, int n, int val)
+		{
+			for (size_type i = 0; i < n; ++i)
+			{
+				insert(position, val);
+			}
+		}
+
+		template <typename InputIterator>
+		void				insert_private(iterator position, InputIterator first, InputIterator last)
+		{
+			while (first != last)
+			{
+				insert(position, *first);
+				++position;
+				++first;
+			}
+		}
+
+		template <typename InputIterator>
+		void				assign_private(InputIterator first, InputIterator last)
+		{
+			clear();
+			while (first != last)
+			{
+				push_back(*first);
+				++first;
+			}
+		}
+
+		void				assign_private(int n, int val)
+		{
+			clear();
+			for (size_type i = 0; i < n; ++i)
+			{
+				push_back(val);
+			}
+		}
+
 	};
+
+	template <typename Iterator>
+		bool				equal(const Iterator &lbegin, const Iterator &lend, const Iterator &rbegin)
+		{
+			while (lbegin != lend)
+			{
+				if (*lbegin != *rbegin)
+					return (false);
+				++rbegin;
+				++lbegin;
+			}
+			return (true);
+		}
 }
 
 // 기본생성자, allocator로 기본 용량만큼 할당받고 끝
 template <typename T, typename Alloc>
-ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(100), _size(0), _allocator(alloc)
 {
 	_begin = _allocator.allocate(_capacity);
 }
@@ -300,7 +365,6 @@ void				ft::Vector<T, Alloc>::reserve(size_type n)
 			_allocator.construct(temp + i, *(_begin + i));
 		clear();
 		_allocator.deallocate(_begin, _capacity);
-
 		_begin = temp;
 		_capacity = n;
 	}
@@ -386,12 +450,7 @@ template <typename T, typename Alloc>
 	template <typename InputIterator>
 void				ft::Vector<T, Alloc>::assign(InputIterator first, InputIterator last)
 {
-	clear();
-	while (first != last)
-	{
-		push_back(*first);
-		++first;
-	}
+	assign_private(first, last);
 }
 
 template <typename T, typename Alloc>
@@ -440,14 +499,24 @@ void				ft::Vector<T, Alloc>::pop_back()
 template <typename T, typename Alloc>
 typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::insert(iterator position, const value_type &val)
 {
+	value_type	front;
 	value_type	temp;
 
-	if (position != _begin + _size) // 끝이 아니라면
+	if (position != end()) // 끝이 아니라면
 	{
-		temp = *position;
+		front = *position;
 		*position = val;
-		++position;
-		insert(position, temp);
+		position++;
+		
+		while (position != end())
+		{
+			
+			temp = *position;
+			*position = front;
+			position++;
+			front = temp;
+		}
+		push_back(front);
 	}
 	else
 	{
@@ -470,14 +539,8 @@ template <typename T, typename Alloc>
 	template <class InputIterator>
 void				ft::Vector<T, Alloc>::insert(iterator position, InputIterator first, InputIterator last)
 {
-	while (first != last)
-	{
-		insert(position, *first);
-		++position;
-		++first;
-	}
+	insert_private(position, first, last);
 }
-
 
 template <typename T, typename Alloc>
 typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator position)
@@ -485,13 +548,11 @@ typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator p
 	size_type	i;
 	pointer		temp;
 	iterator	iter;
-	iterator	end;
 
 	i = 0;
 	temp = _allocator.allocate(_capacity);
 	iter = begin();
-	end = end();
-	while (iter != end)
+	while (iter != end())
 	{
 		if (iter != position)
 		{
@@ -503,6 +564,7 @@ typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator p
 	clear();
 	_allocator.deallocate(_begin, _capacity);
 	_begin = temp;
+	return (_begin);
 }
 
 template <typename T, typename Alloc>
@@ -513,6 +575,7 @@ typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator f
 		erase(first);
 		++first;
 	}
+	return (_begin);
 }
 
 template <typename T>

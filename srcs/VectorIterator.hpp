@@ -22,7 +22,7 @@ public:
 	bool				operator==(const VectorIterator &);
 	bool				operator!=(const VectorIterator &);
 
-	reference			operator*();
+	reference			operator*() const;
 	pointer				operator->();
 
 	// void				operator=(const T &); // *a = b ?? 알아서 되지 않을까
@@ -60,7 +60,7 @@ VectorIterator<T>::VectorIterator(pointer element) : BaseIterator<random_access_
 }
 
 template <typename T>
-VectorIterator<T>::VectorIterator(const VectorIterator &copy) : BaseIterator<random_access_iterator_tag, T>()
+VectorIterator<T>::VectorIterator(const VectorIterator &copy)
 {
 	this->_element = copy._element;
 }
@@ -90,7 +90,7 @@ bool				VectorIterator<T>::operator!=(const VectorIterator &ref)
 }
 
 template <typename T>
-T					&VectorIterator<T>::operator*()
+T					&VectorIterator<T>::operator*() const
 {
 	return (*(this->_element));
 }
@@ -104,7 +104,7 @@ T					*VectorIterator<T>::operator->()
 template <typename T>
 VectorIterator<T>		&VectorIterator<T>::operator++()
 {
-	++(this->_element);
+	++this->_element;
 	return (*this);
 }
 
@@ -112,9 +112,9 @@ VectorIterator<T>		&VectorIterator<T>::operator++()
 template <typename T>
 VectorIterator<T>		VectorIterator<T>::operator++(int)
 {
-	VectorIterator	tmp(*this);
+	VectorIterator	tmp = *this;
 
-	++(this->_element);
+	++this->_element;
 	return (tmp);
 }
 

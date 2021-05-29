@@ -17,52 +17,107 @@ namespace ft
 		typedef typename allocator_type::const_reference	const_reference;
 		typedef typename allocator_type::pointer			pointer;
 		typedef typename allocator_type::const_pointer		const_pointer;
-		typedef ListIterator<T>							iterator;
+		typedef ListIterator<T>								iterator;
 		typedef const ListIterator<T>						const_iterator;
-		typedef ReverseListIterator<T>					reverse_iterator;
+		typedef ReverseListIterator<T>						reverse_iterator;
 		typedef const ReverseListIterator<T>				const_reverse_iterator;
 		typedef ptrdiff_t									difference_type;
 		typedef size_t										size_type;
 
+	// public:
 	private:
-		// allocator_type	_allocator;
-		std::allocator<T>	_allocator; // 자동완성때문에 잠깐 바꿔놓음 위에꺼로 해야됨
-		pointer				_begin;
-		pointer				_last;
-		pointer				_end;
+		typedef typename allocator_type::template
+				rebind< Node<T> >::other node_allocator;
+		typedef typename node_allocator::pointer	_node_pointer;
+
+		node_allocator		_node_alloc;
+
+		allocator_type		_allocator;
+		// std::allocator< Node<T> >	_allocator; // 자동완성때문에 잠깐 바꿔놓음 위에꺼로 해야됨
+		Node<T>*			_begin;
+		Node<T>*			_last;
+		Node<T>*			_end;
 		size_t				_size;
 
-	public:
-		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
+		void		list_private(int n, int val)
 		{
-			_end = _allocator.allocate(1);
-			_allocator.construct(_end, Node<T>(0));
-		}
-		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
-		{
+			_end = _node_alloc.allocate(1);
+			_node_alloc.construct(_end, Node<T>());
+			_begin = _end;
 			for (size_type i = 0; i < n; ++i)
 				push_back(val);
 		}
+
 		template <typename InputIterator>
-		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
+		void		list_private(InputIterator first, InputIterator last)
 		{
+			_end = _node_alloc.allocate(1);
+			_node_alloc.construct(_end, Node<T>());
+			_begin = _end;
 			while (first != last)
 			{
 				push_back(*first);
 				++first;
 			}
 		}
-		List(const List &copy) : _allocator(copy._allocator), _size(copy._size), _begin(copy._begin), _end(copy._end), _last(copy._last)
+
+	public:
+		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
 		{
+			_end = _node_alloc.allocate(1);
+			_node_alloc.construct(_end, Node<T>());
+			_begin = _end;
 		}
+
+		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
+		{
+			_end = _node_alloc.allocate(1);
+			_node_alloc.construct(_end, Node<T>());
+			_begin = _end;
+			for (size_type i = 0; i < n; ++i)
+				push_back(val);
+		}
+
+		template <typename InputIterator>
+		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
+		{
+			list_private(first, last);
+		}
+
+		List(const List &copy) : _allocator(copy._allocator), _size(0), _begin(0), _end(0), _last(0)
+		{
+			iterator		iter;
+
+			_end = _node_alloc.allocate(1);
+			_node_alloc.construct(_end, Node<T>());
+			_begin = _end;
+			iter = copy.begin();
+			while (iter != copy.end())
+			{
+				push_back(*iter);
+				++iter;
+			}
+		}
+
 		~List()
 		{
-			_allocator.destroy(_end);
-			_allocator.deallocate(_end);
+			clear();
+			_node_alloc.destroy(_end);
+			_node_alloc.deallocate(_end, 1);
 		}
+
 		List				&operator=(const List &copy)
 		{
-			this->_allocator = copy._allocator;
+			iterator	iter;
+			
+			clear();
+			iter = copy.begin();
+			while (iter != copy.end())
+			{
+				push_back(*iter);
+				++iter;
+			}
+			return (*this);
 		}
 	
 		// Return iterator to beginning
@@ -204,7 +259,7 @@ namespace ft
 
 		size_type			max_size() const
 		{
-			return (_allocator.max_size());
+			return (_node_alloc.max_size());
 		}
 
 		// Test whether container is empty
@@ -240,21 +295,21 @@ namespace ft
 		// Member types reference and const_reference are the reference types to the elements of the container (see list member types).
 		reference			front()
 		{
-			return (*_begin);
+			return (_begin->_data);
 		}
 		const_reference		front() const
 		{
-			return (*_begin);
+			return (_begin->_data);
 		}
 
 
 		reference			back()
 		{
-			return (*_last);
+			return (_last->_data);
 		}
 		const_reference		back() const
 		{
-			return (*_last);
+			return (*_last->_data);
 		}
 
 
@@ -286,7 +341,7 @@ namespace ft
 // Return value
 // none
 		template <typename InputIterator>
-		void				assign(InputIterator first, InputIterator last)
+		void				assign_private(InputIterator first, InputIterator last)
 		{
 			clear();
 			while (first != last)
@@ -295,6 +350,20 @@ namespace ft
 				++first;
 			}
 		}
+
+		void				assign_private(int n, int val)
+		{
+			clear();
+			for (size_type i = 0; i < n; ++i)
+				push_back(val);
+		}
+
+		template <typename InputIterator>
+		void				assign(InputIterator first, InputIterator last)
+		{
+			assign_private(first, last);
+		}
+
 		void				assign(size_type n, const value_type &val)
 		{
 			clear();
@@ -318,12 +387,12 @@ namespace ft
 // The storage for the new elements is allocated using the container's allocator, which may throw exceptions on failure (for the default allocator, bad_alloc is thrown if the allocation request does not succeed).
 		void	push_front(const value_type &val)
 		{
-			pointer		temp;
+			Node<T>*		temp;
 
 			if (_size == 0)
 			{
-				_begin = _allocator.allocate(1);
-				_allocator.construct(_begin, val);
+				_begin = _node_alloc.allocate(1);
+				_node_alloc.construct(_begin, val);
 				_last = _begin;
 				_last->_next = _end;
 				_last->_prev = _end;
@@ -333,8 +402,8 @@ namespace ft
 			else
 			{
 				temp = _begin;
-				_begin = _allocator.allocate(1);
-				_allocator.construct(_begin, val);
+				_begin = _node_alloc.allocate(1);
+				_node_alloc.construct(_begin, val);
 				_begin->_next = temp;
 				_begin->_prev = _end;
 				_end->_next = _begin;
@@ -349,7 +418,7 @@ namespace ft
 // This destroys the removed element.
 		void	pop_front()
 		{
-			pointer		temp;
+			Node<T>*		temp;
 			if (_size == 0)
 				return ;
 			
@@ -358,8 +427,8 @@ namespace ft
 			_begin = _begin->_next;
 			_begin->_prev = _end;
 			_end->_next = _begin;
-			_allocator.destroy(temp);
-			_allocator.deallocate(temp);
+			_node_alloc.destroy(temp);
+			_node_alloc.deallocate(temp, 1);
 			--_size;
 		}
 
@@ -367,18 +436,18 @@ namespace ft
 		{
 			if (_last == 0)
 			{
-				_begin = _allocator.allocate(1);
-				_allocator.construct(_begin, Node<T>(value));
+				_begin = _node_alloc.allocate(1);
+				_node_alloc.construct(_begin, Node<T>(value));
 				_last = _begin;
-				_last->next = _end;
-				_last->prev = _end;
+				_last->_next = _end;
+				_last->_prev = _end;
 				_end->_prev = _last;
 				_end->_next = _begin;
 			}
 			else
 			{
-				_last->_next = _allocator.allocate(1);
-				_allocator.construct(_last->_next, Node<T>(value));
+				_last->_next = _node_alloc.allocate(1);
+				_node_alloc.construct(_last->_next, Node<T>(value));
 				_last->_next->_prev = _last;
 				_last = _last->_next;
 				_last->_next = _end;
@@ -387,42 +456,53 @@ namespace ft
 			++_size;
 
 		};
+
 		void				pop_back()
 		{
 			if (_begin == 0)
 				return ;
 			else
 			{
-				pointer		temp;
+				Node<T>		*temp;
 
 				temp = _last;
 				_last = _last->_prev;
 				_last->_next = _end;
-				_allocator.destroy(temp);
-				_allocator.deallocate(temp);
+				_node_alloc.destroy(temp);
+				_node_alloc.deallocate(temp, 1);
 				_end->_prev = _last;
 				--_size;
 			}
 		}
+
 		iterator			insert(iterator position, const value_type &val)
 		{
-			pointer		temp;
+			iterator	temp;
 
-			temp = position->_prev;
-			position->_prev = _allocator.allocate(1);
-			_allocator.construct(position->_prev, Node<T>(val));
-			temp->_next = position->_prev;
-			position->_prev->_next = position._element;
-			position->_prev->_prev = temp;
+			temp = position._element->_prev;
+			position._element->_prev = _node_alloc.allocate(1);
+			_node_alloc.construct(position._element->_prev, Node<T>(val));
+			temp._element->_next = position._element->_prev;
+			position._element->_prev->_next = position._element;
+			position._element->_prev->_prev = temp._element;
 			++_size;
+			return (temp);
 		}
+
 		void				insert(iterator position, size_type n, const value_type& val)
 		{
 			for (size_type i = 0; i < n; ++i)
 				insert(position, val);
 		}
+
+		void				insert_private(iterator position, int n, int val)
+		{
+			for (size_type i = 0; i < n; ++i)
+				insert(position, val);
+		}
+
 		template <class InputIterator>
-		void				insert(iterator position, InputIterator first, InputIterator last)
+		void				insert_private(iterator position, InputIterator first, InputIterator last)
 		{
 			while (first != last)
 			{
@@ -431,29 +511,39 @@ namespace ft
 				++position;
 			}
 		}
+
+		template <class InputIterator>
+		void				insert(iterator position, InputIterator first, InputIterator last)
+		{
+			insert_private(position, first, last);
+		}
+
 		iterator			erase(iterator position)
 		{
-			pointer		temp;
+			Node<T>*		temp;
 
-			temp = position->_next;
+			temp = position._element->_next;
 			if (position == begin())
 			{
-				_begin = position->_next;
-				position->_prev->_next = position->_next;
-				position->_next->_prev = position->_prev;
-				_allocator.destroy(position._element);
-				_allocator.deallocate(position._element);
+				_begin = position._element->_next;
+				position._element->_prev->_next = position._element->_next;
+				position._element->_next->_prev = position._element->_prev;
+				_node_alloc.destroy(position._element);
+				_node_alloc.deallocate(position._element, 1);
+				--_size;
+				return (end());
 			}
 			else
 			{
-				position->_prev->_next = position->_next;
-				position->_next->_prev = position->_prev;
-				_allocator.destroy(position->_element);
-				_allocator.deallocate(position->_element);
+				position._element->_prev->_next = position._element->_next;
+				position._element->_next->_prev = position._element->_prev;
+				_node_alloc.destroy(position._element);
+				_node_alloc.deallocate(position._element, 1);
+				--_size;
+				return (position._element->_next);
 			}
-			--_size;
-			return (temp);
 		}
+
 		iterator			erase(iterator first, iterator last)
 		{
 			while (first != last)
@@ -461,16 +551,19 @@ namespace ft
 				erase(first);
 				++first;
 			}
+			return (last);
 		}
-		template <typename T>
-		static void				swap(T &a, T &b)
-		{
-			T		temp;
 
-			temp = a;
-			a = b;
-			b = temp;
+		template <typename U>
+		void			swap(U &x, U &y)
+		{
+			U	temp;
+
+			temp = x;
+			x = y;
+			y = temp;
 		}
+		
 		void				swap(List& x)
 		{
 			swap(this->_allocator, x._allocator);
@@ -561,11 +654,11 @@ namespace ft
 //     Notice that the range includes all the elements between first and last, including the element pointed by first but not the one pointed by last.
 //     Member types iterator and const_iterator are bidirectional iterator types that point to elements.
 
-		void splice (iterator position, list& x) // entire list (1)
+		void splice (iterator position, List& x) // entire list (1)
 		{
-			position->_prev->_next = x._begin;
-			(x._begin)->_prev = position->_prev;
-			position->_prev = x._last;
+			position._element->_prev->_next = x._begin;
+			(x._begin)->_prev = position._element->_prev;
+			position._element->_prev = x._last;
 			x._last->_next = position._element;
 			_size += x.size();
 			
@@ -574,39 +667,59 @@ namespace ft
 			_last = _end->_prev;
 		}
 
-		void splice (iterator position, list& x, iterator i); // single element (2)
+		void splice (iterator position, List& x, iterator i) // single element (2)
 		{
-			i->_prev->_next = i->_next;
-			i->_next->_prev = i->_prev;
+			if (position == begin())
+			
+			i._element->_prev->_next = i._element->_next;
+			i._element->_next->_prev = i._element->_prev;
 			--(x._size);
 
-			position->_prev->_next = i._element;
-			i->_prev = position->_prev;
-			i->_next = position._element;
-			position->_prev = i._element;
+			i._element->_next = position._element->_next;
+			position._element->_next->_prev = i._element;
+
+			position._element->_next = i._element;
+			i._element->_prev = position._element;
+			
 			++_size;
+
 			_begin = _end->_next;
 			_last = _end->_prev;
 		}
 
-		void splice (iterator position, list& x, iterator first, iterator last); // element range (3)
+		void splice (iterator position, List& x, iterator first, iterator last) // element range (3)
 		{
-			size_type		size;
+			size_type	size;
+			iterator	iter;
+
+			iter = first;
+			while (iter != last)
+			{
+				std::cout << iter._element << '\n';
+				++size;
+				++iter;
+			}
+
+			
+			// size_type		size;
 
 			size = 0;
-			first->_prev->_next = last._element;
-			last->_prev = first->_prev;
+			first._element->_prev->_next = last._element;
+			last._element->_prev = first._element->_prev;
 
-			position->_prev->_next = first._element;
-			first->_prev = position->_prev;
-			last->_prev->_next = position._element;
-			position->_prev = last._prev;
+			position._element->_next->_prev = last._element->_prev;
+			last._element->_next = position._element->_next;
+			position._element->_next = first._element;
+			first._element->_prev = position._element;
 
-			while (first != last)
-			{
-				++first;
-				++size;
-			}
+			// std::cout << first._element;
+			// std::cout << last._element;
+			// while (first != last)
+			// {
+			// 	std::cout << "1";
+			// 	++first;
+			// 	++size;
+			// }
 			x._size -= size;
 			_size += size;
 			_begin = _end->_next;
@@ -750,7 +863,7 @@ namespace ft
 // comp
 //     Binary predicate that, taking two values of the same type than those contained in the list, returns true if the first argument is considered to go before the second in the strict weak ordering it defines, and false otherwise.
 //     This shall be a function pointer or a function object.
-		void merge (list& x)
+		void merge (List& x)
 		{
 			iterator	iter;
 			iterator	iter2;
@@ -771,7 +884,7 @@ namespace ft
 		}
 
 		template <class Compare>
-		void merge (list& x, Compare comp)
+		void merge (List& x, Compare comp)
 		{
 			iterator	iter;
 			iterator	iter2;
@@ -812,7 +925,7 @@ namespace ft
 		{
 			iterator		iter;
 			iterator		iter2;
-			pointer			temp;
+			Node<T>*			temp;
 
 			iter = begin();
 			while (iter != end() - 1)
@@ -843,7 +956,7 @@ namespace ft
 		{
 			iterator		iter;
 			iterator		iter2;
-			pointer			temp;
+			Node<T>*			temp;
 
 			iter = begin();
 			while (iter != end() - 1)
@@ -875,7 +988,7 @@ namespace ft
 		void reverse()
 		{
 			iterator	iter;
-			pointer		temp;
+			Node<T>*		temp;
 
 			iter = begin();
 			while (iter != end())
@@ -908,8 +1021,7 @@ namespace ft
 		}
 
 
-		template <class T, class Alloc>
-		bool operator== (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
+		friend bool operator== (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
 			if (lhs.size() == rhs.size())
 				return (std::equal(lhs.begin(), lhs.end(), rhs.begin()));
@@ -917,36 +1029,41 @@ namespace ft
 				return (false);
 		}
 
-		template <class T, class Alloc>
-		bool operator!= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
+		friend bool operator!= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
 			return (!(lhs == rhs));
 		}
 
-		template <class T, class Alloc>
-		bool operator<  (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
+		friend bool operator<  (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
 			return (std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 		}
 
-		template <class T, class Alloc>
-		bool operator<= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
+		friend bool operator<= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
 			return (!(rhs < lhs));
 		}
 
-		template <class T, class Alloc>
-		bool operator>  (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
+		friend bool operator>  (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
 			return (rhs < lhs);
 		}
 
-		template <class T, class Alloc>
-		bool operator>= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
+		friend bool operator>= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
 			return (!(lhs < rhs));
 		}
 	};
+
+	template <typename T>
+	static void				swap(T &a, T &b)
+	{
+		T		temp;
+
+		temp = a;
+		a = b;
+		b = temp;
+	}
 }
 
 #endif

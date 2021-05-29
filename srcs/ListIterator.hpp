@@ -5,20 +5,22 @@
 # include "Node.hpp"
 
 template <typename T>
-class ListIterator : public BaseIterator<bidirectional_iterator_tag, T, ptrdiff_t, Node<T>*, Node<T>&>
+class ListIterator
 {
+public:
+	Node<T>			*_element;
 public:
 	typedef typename Iterator<bidirectional_iterator_tag, T>::iterator_category	iterator_category;
 	typedef typename Iterator<bidirectional_iterator_tag, T>::value_type		value_type;
 	typedef typename Iterator<bidirectional_iterator_tag, T>::difference_type	difference_type;
-	typedef Node<T>*															pointer;
-	typedef Node<T>&															reference;
+	typedef T*																	pointer;
+	typedef T&																	reference;
 
 	ListIterator()
 	{
 	};
 
-	ListIterator(const pointer element)
+	ListIterator(Node<T> *element)
 	{
 		this->_element = element;
 	}
@@ -31,29 +33,30 @@ public:
 	ListIterator&		operator=(const ListIterator &ref)
 	{
 		this->_element = ref._element;
+		return (*this);
 	}
 
 	~ListIterator()
 	{};
 
-	bool				operator==(const ListIterator &)
+	bool				operator==(const ListIterator &ref)
 	{
 		return (this->_element == ref._element);
 	};
 
-	bool				operator!=(const ListIterator &)
+	bool				operator!=(const ListIterator &ref)
 	{
 		return !(this->_element == ref._element);
 	};
 
-	reference			operator*()
+	reference			operator*() const
 	{
-		return (*(this->_element));
+		return (_element->_data);
 	}
 
 	pointer				operator->()
 	{
-		return (this->_element);
+		return (&(_element->_data));
 	}
 
 	ListIterator		&operator++()

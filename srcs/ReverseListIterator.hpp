@@ -5,50 +5,52 @@
 # include "Node.hpp"
 
 template <typename T>
-class ListIterator : public BaseIterator<bidirectional_iterator_tag, T, ptrdiff_t, Node<T>*, Node<T>&>
+class ReverseListIterator
 {
+private:
+	Node<T>			*_element;
 public:
 	typedef typename Iterator<bidirectional_iterator_tag, T>::iterator_category	iterator_category;
 	typedef typename Iterator<bidirectional_iterator_tag, T>::value_type		value_type;
 	typedef typename Iterator<bidirectional_iterator_tag, T>::difference_type	difference_type;
-	typedef Node<T>*															pointer;
-	typedef Node<T>&															reference;
+	typedef T*															pointer;
+	typedef T&															reference;
 
-	ListIterator()
+	ReverseListIterator()
 	{
 	};
 
-	ListIterator(const pointer element)
+	ReverseListIterator(Node<T> *element)
 	{
 		this->_element = element;
 	}
 
-	ListIterator(const ListIterator &copy)
+	ReverseListIterator(const ReverseListIterator &copy)
 	{
 		this->_element = copy._element;
 	};
 
-	ListIterator&		operator=(const ListIterator &ref)
+	ReverseListIterator&		operator=(const ReverseListIterator &ref)
 	{
 		this->_element = ref._element;
 	}
 
-	~ListIterator()
+	~ReverseListIterator()
 	{};
 
-	bool				operator==(const ListIterator &)
+	bool				operator==(const ReverseListIterator &ref)
 	{
 		return (this->_element == ref._element);
 	};
 
-	bool				operator!=(const ListIterator &)
+	bool				operator!=(const ReverseListIterator &ref)
 	{
 		return !(this->_element == ref._element);
 	};
 
 	reference			operator*()
 	{
-		return (*(this->_element));
+		return ((this->_element->_data));
 	}
 
 	pointer				operator->()
@@ -56,29 +58,29 @@ public:
 		return (this->_element);
 	}
 
-	ListIterator		&operator++()
+	ReverseListIterator		&operator++()
 	{
 		this->_element = this->_element->_prev;
 		return (*this);
 	}
 
-	ListIterator		operator++(int)
+	ReverseListIterator		operator++(int)
 	{
-		ListIterator	tmp(*this);
+		ReverseListIterator	tmp(*this);
 
 		this->_element = this->_element->_prev;
 		return (tmp);
 	}
 	
-	ListIterator		&operator--()
+	ReverseListIterator		&operator--()
 	{
 		this->_element = this->_element->_next;
 		return (*this);
 	}
 
-	ListIterator		operator--(int)
+	ReverseListIterator		operator--(int)
 	{
-		ListIterator	tmp(*this);
+		ReverseListIterator	tmp(*this);
 
 		this->_element = this->_element->_next;
 		return (tmp);
