@@ -607,12 +607,38 @@ typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator p
 template <typename T, typename Alloc>
 typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator first, iterator last)
 {
-	while (first != last)
+	size_type	i;
+	pointer		temp;
+	iterator	iter;
+
+	i = 0;
+
+	// 생성
+	temp = _allocator.allocate(_capacity);
+	iter = begin();
+
+	// 복사
+	while (iter != end())
 	{
-		erase(first);
-		++first;
+		if (iter == first)
+		{
+			iter = last - 1;
+		}
+		else
+		{
+			_allocator.construct(&temp[i], *iter);
+			++i;
+		}
+		++iter;
 	}
-	return (_begin);
+
+	// 이전 요소 제거
+	clear();
+	_allocator.deallocate(_begin, _capacity);
+	_begin = temp;
+	_size = i;
+	
+	return (last);
 }
 
 template <typename T, typename Alloc>

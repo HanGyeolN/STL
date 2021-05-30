@@ -33,9 +33,6 @@ namespace ft
 		node_allocator		_node_alloc;
 
 		allocator_type		_allocator;
-		// std::allocator< Node<T> >	_allocator; // 자동완성때문에 잠깐 바꿔놓음 위에꺼로 해야됨
-		Node<T>*			_begin;
-		Node<T>*			_last;
 		Node<T>*			_end;
 		size_t				_size;
 
@@ -43,7 +40,8 @@ namespace ft
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
-			_begin = _end;
+			_end->_prev = _end;
+			_end->_next = _end;
 			for (size_type i = 0; i < n; ++i)
 				push_back(val);
 		}
@@ -53,7 +51,8 @@ namespace ft
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
-			_begin = _end;
+			_end->_prev = _end;
+			_end->_next = _end;
 			while (first != last)
 			{
 				push_back(*first);
@@ -62,35 +61,38 @@ namespace ft
 		}
 
 	public:
-		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
+		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _end(0)
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
-			_begin = _end;
+			_end->_prev = _end;
+			_end->_next = _end;
 		}
 
-		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
+		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _end(0)
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
-			_begin = _end;
+			_end->_prev = _end;
+			_end->_next = _end;
 			for (size_type i = 0; i < n; ++i)
 				push_back(val);
 		}
 
 		template <typename InputIterator>
-		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _begin(0), _end(0), _last(0)
+		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _end(0)
 		{
 			list_private(first, last);
 		}
 
-		List(const List &copy) : _allocator(copy._allocator), _size(0), _begin(0), _end(0), _last(0)
+		List(const List &copy) : _allocator(copy._allocator), _size(0), _end(0)
 		{
 			iterator		iter;
 
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
-			_begin = _end;
+			_end->_prev = _end;
+			_end->_next = _end;
 			iter = copy.begin();
 			while (iter != copy.end())
 			{
@@ -123,7 +125,8 @@ namespace ft
 		// Return iterator to beginning
 		// Returns an iterator pointing to the first element in the list container.
 
-		// Notice that, unlike member list::front, which returns a reference to the first element, this function returns a bidirectional iterator pointing to it.
+		// Notice that, unlike member list::front, which returns a reference to the first element, 
+		// this function returns a bidirectional iterator pointing to it.
 
 		// If the container is empty, the returned iterator value shall not be dereferenced.
 
@@ -138,12 +141,12 @@ namespace ft
 		// Member types iterator and const_iterator are bidirectional iterator types (pointing to an element and to a const element, respectively).
 		iterator			begin()
 		{
-			return (_begin);
+			return (_end->_next);
 		}
 
 		const_iterator		begin() const
 		{
-			return (_begin);
+			return (_end->_next);
 		}
 
 		// Return iterator to end
@@ -295,21 +298,21 @@ namespace ft
 		// Member types reference and const_reference are the reference types to the elements of the container (see list member types).
 		reference			front()
 		{
-			return (_begin->_data);
+			return (_end->_next->_data);
 		}
 		const_reference		front() const
 		{
-			return (_begin->_data);
+			return (_end->_next->_data);
 		}
 
 
 		reference			back()
 		{
-			return (_last->_data);
+			return (_end->_prev->_data);
 		}
 		const_reference		back() const
 		{
-			return (*_last->_data);
+			return (*_end->_prev->_data);
 		}
 
 
@@ -340,6 +343,14 @@ namespace ft
 
 // Return value
 // none
+
+		void				assign_private(int n, int val)
+		{
+			clear();
+			for (size_type i = 0; i < n; ++i)
+				push_back(val);
+		}
+
 		template <typename InputIterator>
 		void				assign_private(InputIterator first, InputIterator last)
 		{
@@ -351,12 +362,6 @@ namespace ft
 			}
 		}
 
-		void				assign_private(int n, int val)
-		{
-			clear();
-			for (size_type i = 0; i < n; ++i)
-				push_back(val);
-		}
 
 		template <typename InputIterator>
 		void				assign(InputIterator first, InputIterator last)
@@ -391,23 +396,20 @@ namespace ft
 
 			if (_size == 0)
 			{
-				_begin = _node_alloc.allocate(1);
-				_node_alloc.construct(_begin, val);
-				_last = _begin;
-				_last->_next = _end;
-				_last->_prev = _end;
-				_end->_next = _last;
-				_end->_prev = _last;
+				_end->_next = _node_alloc.allocate(1);
+				_node_alloc.construct(_end->_next, val);
+				_end->_prev = _end->_next;
+				_end->_next->_prev = _end;
+				_end->_next->_next = _end;
 			}
 			else
 			{
-				temp = _begin;
-				_begin = _node_alloc.allocate(1);
-				_node_alloc.construct(_begin, val);
-				_begin->_next = temp;
-				_begin->_prev = _end;
-				_end->_next = _begin;
-				temp->_prev = _begin;
+				temp = _end->_next;
+				_end->_next = _node_alloc.allocate(1);
+				_node_alloc.construct(_end->_next, val);
+				_end->_next->_next = temp;
+				_end->_next->_prev = _end;
+				temp->_prev = _end->_next;
 			}
 			++_size;
 		}
@@ -419,14 +421,12 @@ namespace ft
 		void	pop_front()
 		{
 			Node<T>*		temp;
+
 			if (_size == 0)
 				return ;
-			
-
-			temp = _begin;
-			_begin = _begin->_next;
-			_begin->_prev = _end;
-			_end->_next = _begin;
+			temp = _end->_next;
+			_end->_next = _end->_next->_next;
+			_end->_next->_prev = _end;
 			_node_alloc.destroy(temp);
 			_node_alloc.deallocate(temp, 1);
 			--_size;
@@ -434,24 +434,21 @@ namespace ft
 
 		void				push_back(const value_type &value)
 		{
-			if (_last == 0)
+			if (_end->_prev == 0)
 			{
-				_begin = _node_alloc.allocate(1);
-				_node_alloc.construct(_begin, Node<T>(value));
-				_last = _begin;
-				_last->_next = _end;
-				_last->_prev = _end;
-				_end->_prev = _last;
-				_end->_next = _begin;
+				_end->_next = _node_alloc.allocate(1);
+				_node_alloc.construct(_end->_next, Node<T>(value));
+				_end->_next->_next = _end;
+				_end->_next->_prev = _end;
+				_end->_prev = _end->_next;
 			}
 			else
 			{
-				_last->_next = _node_alloc.allocate(1);
-				_node_alloc.construct(_last->_next, Node<T>(value));
-				_last->_next->_prev = _last;
-				_last = _last->_next;
-				_last->_next = _end;
-				_end->_prev = _last;
+				_end->_prev->_next = _node_alloc.allocate(1);
+				_node_alloc.construct(_end->_prev->_next, Node<T>(value));
+				_end->_prev->_next->_prev = _end->_prev;
+				_end->_prev = _end->_prev->_next;
+				_end->_prev->_next = _end;
 			}
 			++_size;
 
@@ -459,18 +456,17 @@ namespace ft
 
 		void				pop_back()
 		{
-			if (_begin == 0)
+			if (_end->_next == 0)
 				return ;
 			else
 			{
 				Node<T>		*temp;
 
-				temp = _last;
-				_last = _last->_prev;
-				_last->_next = _end;
+				temp = _end->_prev;
+				_end->_prev = _end->_prev->_prev;
+				_end->_prev->_next = _end;
 				_node_alloc.destroy(temp);
 				_node_alloc.deallocate(temp, 1);
-				_end->_prev = _last;
 				--_size;
 			}
 		}
@@ -525,7 +521,7 @@ namespace ft
 			temp = position._element->_next;
 			if (position == begin())
 			{
-				_begin = position._element->_next;
+				_end->_next = position._element->_next;
 				position._element->_prev->_next = position._element->_next;
 				position._element->_next->_prev = position._element->_prev;
 				_node_alloc.destroy(position._element);
@@ -567,9 +563,7 @@ namespace ft
 		void				swap(List& x)
 		{
 			swap(this->_allocator, x._allocator);
-			swap(this->_begin, x._begin);
 			swap(this->_end, x._end);
-			swap(this->_last, x._last);
 			swap(this->_size, x._size);
 		}
 
@@ -656,74 +650,44 @@ namespace ft
 
 		void splice (iterator position, List& x) // entire list (1)
 		{
-			position._element->_prev->_next = x._begin;
-			(x._begin)->_prev = position._element->_prev;
-			position._element->_prev = x._last;
-			x._last->_next = position._element;
+			Node<T>		*temp;
+
+			temp = position._element->_next;
+			position._element->_next = x._end->_next;
+			(x._end->_next)->_prev = position._element;
+
+			temp->_prev = x._end->_prev;
+			x._end->_next = temp;
+
+			x._end->_next = x._end;
+			x._end->_prev = x._end;
 			_size += x.size();
-			
-			x.clear();
-			_begin = _end->_next;
-			_last = _end->_prev;
+			x._size = 0;
 		}
 
 		void splice (iterator position, List& x, iterator i) // single element (2)
 		{
-			if (position == begin())
-			
-			i._element->_prev->_next = i._element->_next;
-			i._element->_next->_prev = i._element->_prev;
-			--(x._size);
-
-			i._element->_next = position._element->_next;
-			position._element->_next->_prev = i._element;
-
+			Node<T>		*temp;
+			temp = position._element->_next;
 			position._element->_next = i._element;
 			i._element->_prev = position._element;
-			
-			++_size;
 
-			_begin = _end->_next;
-			_last = _end->_prev;
+			i._element->_next = temp;
+			temp->_prev = i._element;
+
+			--(x._size);
+			++_size;
 		}
 
 		void splice (iterator position, List& x, iterator first, iterator last) // element range (3)
 		{
-			size_type	size;
-			iterator	iter;
-
-			iter = first;
-			while (iter != last)
+			while (first != last)
 			{
-				std::cout << iter._element << '\n';
-				++size;
-				++iter;
+				splice(position, x, first);
+				++_size;
+				++first;
+				++position;
 			}
-
-			
-			// size_type		size;
-
-			size = 0;
-			first._element->_prev->_next = last._element;
-			last._element->_prev = first._element->_prev;
-
-			position._element->_next->_prev = last._element->_prev;
-			last._element->_next = position._element->_next;
-			position._element->_next = first._element;
-			first._element->_prev = position._element;
-
-			// std::cout << first._element;
-			// std::cout << last._element;
-			// while (first != last)
-			// {
-			// 	std::cout << "1";
-			// 	++first;
-			// 	++size;
-			// }
-			x._size -= size;
-			_size += size;
-			_begin = _end->_next;
-			_last = _end->_prev;
 		}
 
 // Remove elements with specific value
@@ -753,8 +717,6 @@ namespace ft
 				}
 				++iter;
 			}
-			_begin = _end->_next;
-			_last = _end->_prev;
 		}
 
 
@@ -786,8 +748,6 @@ namespace ft
 				}
 				++iter;
 			}
-			_begin = _end->_next;
-			_last = _end->_prev;
 		}
 
 // Remove duplicate values
@@ -947,8 +907,6 @@ namespace ft
 				}
 				++iter;
 			}
-			_begin = _end->_next;
-			_last = _end->_prev;
 		}
 
 		template <class Compare>
@@ -978,8 +936,6 @@ namespace ft
 				}
 				++iter;
 			}
-			_begin = _end->_next;
-			_last = _end->_prev;
 		}
 
 
@@ -1001,8 +957,6 @@ namespace ft
 			temp = iter->_prev;
 			iter->_prev = iter->_next;
 			iter->_next = temp;
-			_begin = _end->_next;
-			_last = _end->_prev;
 		}
 
 // Get allocator
