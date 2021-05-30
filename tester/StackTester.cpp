@@ -2,7 +2,7 @@
 #include <deque>
 #include <vector>
 #include <iomanip>
-#include "stack.hpp"
+#include "Stack.hpp"
 
 int main(void)
 {

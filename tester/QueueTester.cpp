@@ -1,8 +1,8 @@
 #include <iomanip>
 #include <deque>
 
-#include "list.hpp"
-#include "queue.hpp"
+#include "List.hpp"
+#include "Queue.hpp"
 
 int main(void)
 {

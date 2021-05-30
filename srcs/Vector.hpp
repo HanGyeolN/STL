@@ -3,12 +3,40 @@
 
 # include <iostream>
 # include <memory>
-# include <algorithm>
 # include "VectorIterator.hpp"
 # include "ReverseVectorIterator.hpp"
 
 namespace ft
 {
+	template <class InputIterator1, class InputIterator2>
+	bool			lexicographical_compare ( InputIterator1 first1, InputIterator1 last1,
+											InputIterator2 first2, InputIterator2 last2)
+	{
+	while (first1 != last1)
+	{
+		if (first2 == last2 || *first2 < *first1)
+			return (false);
+		else if (*first1 < *first2)
+			return (true);
+		++first1;
+		++first2;
+	}
+	return (first2 != last2);
+	}
+
+	template <class InputIterator1, class InputIterator2>
+	bool			equal ( InputIterator1 first1, InputIterator1 last1, InputIterator2 first2 )
+	{
+		while (first1 != last1)
+		{
+			if (!(*first1 == *first2))   // or: if (!pred(*first1,*first2)), for version 2
+				return (false);
+			++first1;
+			++first2;
+		}
+		return (true);
+	}
+
 	template < typename T, typename Alloc = std::allocator<T> >
 	class Vector
 	{
@@ -28,8 +56,7 @@ namespace ft
 		typedef size_t										size_type;
 
 	private:
-		// allocator_type	_allocator;
-		std::allocator<T>	_allocator; // 자동완성때문에 잠깐 바꿔놓음 위에꺼로 해야됨
+		allocator_type		_allocator;
 		pointer				_begin;
 		size_t				_capacity;
 		size_t				_size;
@@ -58,10 +85,19 @@ namespace ft
 			}
 			return (*this);
 		}
+
 		iterator			begin();
+		const_iterator		begin() const
+		{ return (_begin); }
 		iterator			end();
+		const_iterator 		end() const
+		{ return (_begin + _size); }
 		reverse_iterator	rbegin();
+		const_reverse_iterator rbegin() const
+		{ return (_begin + _size - 1); }
 		reverse_iterator	rend();
+		const_reverse_iterator rend() const
+		{ return (_begin - 1); }
 
 		size_type			size() const;
 		size_type			max_size() const;
@@ -97,37 +133,37 @@ namespace ft
 		friend bool operator==(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 		{
 			if (lhs.size() == rhs.size())
-				return (equal(lhs.begin(), lhs.end(), rhs.begin()));
+				return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 			else
 				return (false);
 		}
 
 		friend bool operator!=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
-		{
-			return (!(lhs == rhs));
-		}
+		{ return (!(lhs == rhs)); }
 
 		friend bool operator<(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
-		{
-			return (std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
-		}
+		{ return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end())); }
 
 		friend bool operator<=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
-		{
-			return (!(rhs < lhs));
-		}
+		{ return (!(rhs < lhs)); }
 
 		friend bool operator>(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
-		{
-			return (rhs < lhs);
-		}
+		{ return (rhs < lhs); }
 
 		friend bool operator>=(const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
-		{
-			return (!(lhs < rhs));
-		}
+		{ return (!(lhs < rhs)); }
 	
 	private:
+		template <typename U>
+		void			swap(U &x, U &y)
+		{
+			U	temp;
+
+			temp = x;
+			x = y;
+			y = temp;
+		}
+
 		template <typename X>
 		void				private_vector(X first, X last);
 
@@ -185,21 +221,9 @@ namespace ft
 				push_back(val);
 			}
 		}
-
 	};
 
-	template <typename Iterator>
-		bool				equal(const Iterator &lbegin, const Iterator &lend, const Iterator &rbegin)
-		{
-			while (lbegin != lend)
-			{
-				if (*lbegin != *rbegin)
-					return (false);
-				++rbegin;
-				++lbegin;
-			}
-			return (true);
-		}
+		
 }
 
 // 기본생성자, allocator로 기본 용량만큼 할당받고 끝
@@ -546,25 +570,38 @@ template <typename T, typename Alloc>
 typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator position)
 {
 	size_type	i;
+	pointer		ret;
 	pointer		temp;
 	iterator	iter;
 
 	i = 0;
+
+	// 생성
 	temp = _allocator.allocate(_capacity);
 	iter = begin();
+
+	// 복사
 	while (iter != end())
 	{
 		if (iter != position)
 		{
-			_allocator.construct(temp + i, *iter);
+			_allocator.construct(&temp[i], *iter);
 			++i;
+		}
+		else
+		{
+			ret = &temp[i];
 		}
 		++iter;
 	}
+
+	// 이전 요소 제거
 	clear();
 	_allocator.deallocate(_begin, _capacity);
 	_begin = temp;
-	return (_begin);
+	_size = i;
+	
+	return (ret);
 }
 
 template <typename T, typename Alloc>
@@ -576,16 +613,6 @@ typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::erase(iterator f
 		++first;
 	}
 	return (_begin);
-}
-
-template <typename T>
-static void			swap(T &x, T &y)
-{
-	T	temp;
-
-	temp = x;
-	x = y;
-	y = temp;
 }
 
 template <typename T, typename Alloc>

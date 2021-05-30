@@ -1,4 +1,5 @@
 #include "Vector.hpp"
+#include <vector>
 #include <iomanip>
 #include <iostream>
 
@@ -393,5 +394,33 @@ int main(void)
 		for (ft::Vector<int>::iterator it = bar.begin(); it!=bar.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
+	}
+	{
+		std::cout << std::setfill('-') << std::setw(20) << "ERASE" << std::endl;
+		ft::Vector<int>		a;
+		std::vector<int>	b;
+
+		a.push_back(1);
+		a.push_back(2);
+		a.push_back(3);
+
+		b.push_back(1);
+		b.push_back(2);
+		b.push_back(3);
+
+		std::cout << "a: " << a.size() << '\n';
+		std::cout << "b: " << b.size() << '\n';
+
+		while (a.size())
+		{
+			std::cout << a.front() << " ";
+			a.erase(a.begin());
+		}
+
+		while (b.size())
+		{
+			std::cout << b.front() << " ";
+			b.erase(b.begin());
+		}
 	}
 }

@@ -10,11 +10,11 @@ namespace ft
 	{
 	public:
 		typedef	T			value_type;
-		typedef Container	contianer_type;
+		typedef Container	container_type;
 		typedef size_t		size_type;
 
 	public:
-		explicit		queue(const container_type& ctnr = container_type()) 
+		explicit		Queue(const container_type& ctnr = container_type()) 
 		{
 			_container = ctnr;
 		}
@@ -56,41 +56,36 @@ namespace ft
 
 		void			pop()
 		{
-			_container.pop_back();
+			// _container.pop_front();
+			_container.erase(_container.begin());
 		}
 
-		template <class T, class Container>
-		bool operator== (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
+		friend bool operator== (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
 			return (lhs == rhs);
 		}
 
-		template <class T, class Container>
-		bool operator!= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
+		friend bool operator!= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
 			return (lhs != rhs);
 		}
 
-		template <class T, class Container>
-		bool operator<  (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
+		friend bool operator<  (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
 			return (lhs < rhs);
 		}
 
-		template <class T, class Container>
-		bool operator<= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
+		friend bool operator<= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
 			return (lhs <= rhs);
 		}
 
-		template <class T, class Container>
-		bool operator>  (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
+		friend bool operator>  (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
 			return (lhs > rhs);
 		}
 
-		template <class T, class Container>
-		bool operator>= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
+		friend bool operator>= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
 			return (lhs >= rhs);
 		}

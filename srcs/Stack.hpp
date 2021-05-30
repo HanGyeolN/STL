@@ -55,7 +55,7 @@ namespace ft
 //     Alloc shall be a type for which uses_allocator::value is true (for other types, the constructor does not even participate in overload resolution).
 // x
 //     A stack of the same type (i.e., with the same template arguments, T and Container).
-		explicit stack (const container_type& ctnr = container_type())
+		explicit Stack (const container_type& ctnr = container_type())
 		{
 			_container = ctnr;
 		}
@@ -149,38 +149,32 @@ namespace ft
 // Return Value
 // true if the condition holds, and false otherwise.
 
-		template <class T, class Container>
-		bool operator== (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		friend bool operator== (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
 		{
 			return (lhs == rhs);
 		}
 
-		template <class T, class Container>
-		bool operator!= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		friend bool operator!= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
 		{
 			return (lhs != rhs);
 		}
 
-		template <class T, class Container>
-		bool operator<  (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		friend bool operator<  (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
 		{
 			return (lhs < rhs);
 		}
 
-		template <class T, class Container>
-		bool operator<= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		friend bool operator<= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
 		{
 			return (lhs <= rhs);
 		}
 
-		template <class T, class Container>
-		bool operator>  (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		friend bool operator>  (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
 		{
 			return (lhs > rhs);
 		}
 
-		template <class T, class Container>
-		bool operator>= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
+		friend bool operator>= (const Stack<T,Container>& lhs, const Stack<T,Container>& rhs)
 		{
 			return (lhs >= rhs);
 		}
