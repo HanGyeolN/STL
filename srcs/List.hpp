@@ -7,6 +7,35 @@
 
 namespace ft
 {
+	template <class InputIterator1, class InputIterator2>
+	bool			lexicographical_compare ( InputIterator1 first1, InputIterator1 last1,
+											InputIterator2 first2, InputIterator2 last2)
+	{
+	while (first1 != last1)
+	{
+		if (first2 == last2 || *first2 < *first1)
+			return (false);
+		else if (*first1 < *first2)
+			return (true);
+		++first1;
+		++first2;
+	}
+	return (first2 != last2);
+	}
+
+	template <class InputIterator1, class InputIterator2>
+	bool			equal ( InputIterator1 first1, InputIterator1 last1, InputIterator2 first2 )
+	{
+		while (first1 != last1)
+		{
+			if (!(*first1 == *first2))   // or: if (!pred(*first1,*first2)), for version 2
+				return (false);
+			++first1;
+			++first2;
+		}
+		return (true);
+	}
+
 	template <typename T, typename Alloc = std::allocator<T> >
 	class List
 	{
@@ -31,7 +60,6 @@ namespace ft
 		typedef typename node_allocator::pointer	_node_pointer;
 
 		node_allocator		_node_alloc;
-
 		allocator_type		_allocator;
 		Node<T>*			_end;
 		size_t				_size;
@@ -58,6 +86,51 @@ namespace ft
 				push_back(*first);
 				++first;
 			}
+		}
+
+		void				assign_private(int n, int val)
+		{
+			clear();
+			for (size_type i = 0; i < n; ++i)
+				push_back(val);
+		}
+
+		template <typename InputIterator>
+		void				assign_private(InputIterator first, InputIterator last)
+		{
+			clear();
+			while (first != last)
+			{
+				push_back(*first);
+				++first;
+			}
+		}
+
+		void				insert_private(iterator position, int n, int val)
+		{
+			for (size_type i = 0; i < n; ++i)
+				insert(position, val);
+		}
+
+		template <class InputIterator>
+		void				insert_private(iterator position, InputIterator first, InputIterator last)
+		{
+			while (first != last)
+			{
+				insert(position, *first);
+				++first;
+				++position;
+			}
+		}
+
+		template <typename U>
+		void			swap(U &x, U &y)
+		{
+			U	temp;
+
+			temp = x;
+			x = y;
+			y = temp;
 		}
 
 	public:
@@ -344,23 +417,6 @@ namespace ft
 // Return value
 // none
 
-		void				assign_private(int n, int val)
-		{
-			clear();
-			for (size_type i = 0; i < n; ++i)
-				push_back(val);
-		}
-
-		template <typename InputIterator>
-		void				assign_private(InputIterator first, InputIterator last)
-		{
-			clear();
-			while (first != last)
-			{
-				push_back(*first);
-				++first;
-			}
-		}
 
 
 		template <typename InputIterator>
@@ -491,23 +547,6 @@ namespace ft
 				insert(position, val);
 		}
 
-		void				insert_private(iterator position, int n, int val)
-		{
-			for (size_type i = 0; i < n; ++i)
-				insert(position, val);
-		}
-
-		template <class InputIterator>
-		void				insert_private(iterator position, InputIterator first, InputIterator last)
-		{
-			while (first != last)
-			{
-				insert(position, *first);
-				++first;
-				++position;
-			}
-		}
-
 		template <class InputIterator>
 		void				insert(iterator position, InputIterator first, InputIterator last)
 		{
@@ -548,16 +587,6 @@ namespace ft
 				++first;
 			}
 			return (last);
-		}
-
-		template <typename U>
-		void			swap(U &x, U &y)
-		{
-			U	temp;
-
-			temp = x;
-			x = y;
-			y = temp;
 		}
 		
 		void				swap(List& x)
@@ -774,10 +803,10 @@ namespace ft
 
 			if (_size == 0)
 				return ;
-			iter = begin() + 1;
+			iter = _end->_next->_next;
 			while (iter != end())
 			{
-				if (*iter == *(iter - 1))
+				if (*iter == (iter._element->_prev->_data))
 					erase(iter);
 				++iter;
 			}
@@ -790,10 +819,10 @@ namespace ft
 
 			if (_size == 0)
 				return ;
-			iter = begin() + 1;
+			iter = _end->_next->_next;
 			while (iter != end())
 			{
-				if (binary_pred(*iter, *(iter - 1)))
+				if (binary_pred(*iter, (iter._element->_prev->_data)))
 					erase(iter);
 				++iter;
 			}
@@ -888,20 +917,20 @@ namespace ft
 			Node<T>*			temp;
 
 			iter = begin();
-			while (iter != end() - 1)
+			while (iter != --end())
 			{
-				iter2 = iter + 1;
+				iter2 = iter._element->_next;
 				while (iter2 != end())
 				{
-					if (iter < iter2)
+					if (*iter < *iter2)
 					{
-						iter->_prev->_next = iter2._element;
-						iter->_next->_prev = iter2._element;
-						iter2->_prev->_next = iter._element;
-						iter2->_next->_prev = iter._element;
-						temp = iter->_next;
-						iter->_next = iter2->_next;
-						iter2->_next = temp;
+						iter._element->_prev->_next = iter2._element;
+						iter._element->_next->_prev = iter2._element;
+						iter2._element->_prev->_next = iter._element;
+						iter2._element->_next->_prev = iter._element;
+						temp = iter._element->_next;
+						iter._element->_next = iter2._element->_next;
+						iter2._element->_next = temp;
 					}
 					++iter2;
 				}
@@ -917,9 +946,9 @@ namespace ft
 			Node<T>*			temp;
 
 			iter = begin();
-			while (iter != end() - 1)
+			while (iter != --end())
 			{
-				iter2 = iter + 1;
+				iter2 = iter._element->_next;
 				while (iter2 != end())
 				{
 					if (comp(*iter, *iter2))
@@ -978,7 +1007,7 @@ namespace ft
 		friend bool operator== (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
 			if (lhs.size() == rhs.size())
-				return (std::equal(lhs.begin(), lhs.end(), rhs.begin()));
+				return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 			else
 				return (false);
 		}
@@ -990,7 +1019,7 @@ namespace ft
 
 		friend bool operator<  (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
 		{
-			return (std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+			return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 		}
 
 		friend bool operator<= (const List<T,Alloc>& lhs, const List<T,Alloc>& rhs)
@@ -1009,15 +1038,6 @@ namespace ft
 		}
 	};
 
-	template <typename T>
-	static void				swap(T &a, T &b)
-	{
-		T		temp;
-
-		temp = a;
-		a = b;
-		b = temp;
-	}
 }
 
 #endif

@@ -381,44 +381,6 @@ namespace ft
 // pair is a class template declared in <utility> (see pair).
 
 
-		std::pair<iterator, bool>	insert_value(pointer node, const value_type& val)
-		{
-			if (val.first < (node->_data).first)
-			{
-				if (node->_left == 0)
-				{
-					++_size;
-					node->_left = _allocator.allocate(1);
-					_allocator.construct(node->_left, MapNode<T>(val));
-					node->_left->_parent = _node->_left;
-					return (std::pair<iterator, bool>(node, true));
-				}
-				else
-				{
-					return (insert_value(node->_left, val));
-				}
-			}
-			else if (val.first > (node->_data).first)
-			{
-				if (node->_right == 0)
-				{
-					++_size;
-					node->_right = _allocator.allocate(1);
-					_allocator.construct(node->_right, MapNode<T>(val));
-					node->_right->_parent = _node->_right;
-					return (std::pair<iterator, bool>(node, true));
-				}
-				else
-				{
-					return (insert_value(node->_right, val));
-				}
-			}
-			else
-			{
-				return (std::pair<iterator, bool>(node, false));
-			}
-		}
-
 		std::pair<iterator, bool> insert(const value_type& val)
 		{
 			if (_size == 0)
@@ -587,15 +549,6 @@ namespace ft
 
 // Return value
 // none
-		template <typename T>
-		void	swap(const T& a, const T& b)
-		{
-			T		temp;
-
-			temp = a;
-			a = b;
-			b = temp;
-		}
 
 		void swap (map& x)
 		{
@@ -856,6 +809,55 @@ namespace ft
 			return (_allocator);
 		}
 
+	private:
+		
+		template <typename U>
+		void	swap(const U& a, const U& b)
+		{
+			U		temp;
+
+			temp = a;
+			a = b;
+			b = temp;
+		}
+
+		std::pair<iterator, bool>	insert_value(pointer node, const value_type& val)
+		{
+			if (val.first < (node->_data).first)
+			{
+				if (node->_left == 0)
+				{
+					++_size;
+					node->_left = _allocator.allocate(1);
+					_allocator.construct(node->_left, MapNode<T>(val));
+					node->_left->_parent = _node->_left;
+					return (std::pair<iterator, bool>(node, true));
+				}
+				else
+				{
+					return (insert_value(node->_left, val));
+				}
+			}
+			else if (val.first > (node->_data).first)
+			{
+				if (node->_right == 0)
+				{
+					++_size;
+					node->_right = _allocator.allocate(1);
+					_allocator.construct(node->_right, MapNode<T>(val));
+					node->_right->_parent = _node->_right;
+					return (std::pair<iterator, bool>(node, true));
+				}
+				else
+				{
+					return (insert_value(node->_right, val));
+				}
+			}
+			else
+			{
+				return (std::pair<iterator, bool>(node, false));
+			}
+		}
 	};
 }
 

@@ -381,27 +381,27 @@ int main(void)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 	}
-	{
-		std::cout << std::setfill('-') << std::setw(20) << "SPLICE" << std::endl;
-		ft::List<int> mylist1, mylist2;
-		ft::List<int>::iterator it;
+	// {
+	// 	std::cout << std::setfill('-') << std::setw(20) << "SPLICE" << std::endl;
+	// 	ft::List<int> mylist1, mylist2;
+	// 	ft::List<int>::iterator it;
 
-		// set some initial values:
-		for (int i=1; i<=4; ++i)
-			mylist1.push_back(i);      // mylist1: 1 2 3 4
+	// 	// set some initial values:
+	// 	for (int i=1; i<=4; ++i)
+	// 		mylist1.push_back(i);      // mylist1: 1 2 3 4
 
-		for (int i=1; i<=3; ++i)
-			mylist2.push_back(i*10);   // mylist2: 10 20 30
+	// 	for (int i=1; i<=3; ++i)
+	// 		mylist2.push_back(i*10);   // mylist2: 10 20 30
 
-		it = mylist1.begin();
-		++it;                         // points to 2
-		show_list(mylist1);
-		show_list(mylist2);
+	// 	it = mylist1.begin();
+	// 	++it;                         // points to 2
+	// 	show_list(mylist1);
+	// 	show_list(mylist2);
 		
 		
 
-		mylist1.splice (it, mylist2); // mylist1: 1 10 20 30 2 3 4
-		show_list(mylist1);
+	// 	mylist1.splice (it, mylist2); // mylist1: 1 10 20 30 2 3 4
+	// 	show_list(mylist1);
 		// mylist2 (empty)
 		// "it" still points to 2 (the 5th element)
 
@@ -427,55 +427,55 @@ int main(void)
 		// for (it=mylist2.begin(); it!=mylist2.end(); ++it)
 		// 	std::cout << ' ' << *it;
 		// std::cout << '\n';
+	// }
+	{
+		std::cout << std::setfill('-') << std::setw(20) << "REMOVE" << std::endl;
+		int myints[]= {17,89,7,14};
+		ft::List<int> mylist (myints,myints+4);
+
+		mylist.remove(89);
+
+		std::cout << "mylist contains:";
+		for (ft::List<int>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
+			std::cout << ' ' << *it;
+		std::cout << '\n';
 	}
-	// {
-	// 	std::cout << std::setfill('-') << std::setw(20) << "REMOVE" << std::endl;
-	// 	int myints[]= {17,89,7,14};
-	// 	ft::List<int> mylist (myints,myints+4);
+	{
+		std::cout << std::setfill('-') << std::setw(20) << "REMOVE_IF" << std::endl;
+		int myints[]= {15,36,7,17,20,39,4,1};
+		ft::List<int> mylist (myints,myints+8);   // 15 36 7 17 20 39 4 1
 
-	// 	mylist.remove(89);
+		mylist.remove_if (single_digit);           // 15 36 17 20 39
 
-	// 	std::cout << "mylist contains:";
-	// 	for (ft::List<int>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
-	// 		std::cout << ' ' << *it;
-	// 	std::cout << '\n';
-	// }
-	// {
-	// 	std::cout << std::setfill('-') << std::setw(20) << "REMOVE_IF" << std::endl;
-	// 	int myints[]= {15,36,7,17,20,39,4,1};
-	// 	ft::List<int> mylist (myints,myints+8);   // 15 36 7 17 20 39 4 1
+		mylist.remove_if (is_odd());               // 36 20
 
-	// 	mylist.remove_if (single_digit);           // 15 36 17 20 39
+		std::cout << "mylist contains:";
+		for (ft::List<int>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
+			std::cout << ' ' << *it;
+		std::cout << '\n';
+	}
+	{
+		std::cout << std::setfill('-') << std::setw(20) << "UNIQUE" << std::endl;
+		double mydoubles[]={ 12.15,  2.72, 73.0,  12.77,  3.14,
+							 12.77, 73.35, 72.25, 15.3,  72.25 };
+		ft::List<double> mylist (mydoubles,mydoubles+10);
 
-	// 	mylist.remove_if (is_odd());               // 36 20
+		mylist.sort();             //  2.72,  3.14, 12.15, 12.77, 12.77,
+		// 15.3,  72.25, 72.25, 73.0,  73.35
 
-	// 	std::cout << "mylist contains:";
-	// 	for (ft::List<int>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
-	// 		std::cout << ' ' << *it;
-	// 	std::cout << '\n';
-	// }
-	// {
-	// 	std::cout << std::setfill('-') << std::setw(20) << "UNIQUE" << std::endl;
-	// 	double mydoubles[]={ 12.15,  2.72, 73.0,  12.77,  3.14,
-	// 						 12.77, 73.35, 72.25, 15.3,  72.25 };
-	// 	ft::List<double> mylist (mydoubles,mydoubles+10);
+		mylist.unique();           //  2.72,  3.14, 12.15, 12.77
+		// 15.3,  72.25, 73.0,  73.35
 
-	// 	mylist.sort();             //  2.72,  3.14, 12.15, 12.77, 12.77,
-	// 	// 15.3,  72.25, 72.25, 73.0,  73.35
+		mylist.unique (same_integral_part);  //  2.72,  3.14, 12.15
+		// 15.3,  72.25, 73.0
 
-	// 	mylist.unique();           //  2.72,  3.14, 12.15, 12.77
-	// 	// 15.3,  72.25, 73.0,  73.35
+		mylist.unique (is_near());           //  2.72, 12.15, 72.25
 
-	// 	mylist.unique (same_integral_part);  //  2.72,  3.14, 12.15
-	// 	// 15.3,  72.25, 73.0
-
-	// 	mylist.unique (is_near());           //  2.72, 12.15, 72.25
-
-	// 	std::cout << "mylist contains:";
-	// 	for (ft::List<double>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
-	// 		std::cout << ' ' << *it;
-	// 	std::cout << '\n';
-	// }
+		std::cout << "mylist contains:";
+		for (ft::List<double>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
+			std::cout << ' ' << *it;
+		std::cout << '\n';
+	}
 	// {
 	// 	std::cout << std::setfill('-') << std::setw(20) << "MERGE" << std::endl;
 	// 	ft::List<double> first, second;
