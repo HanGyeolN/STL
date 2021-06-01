@@ -2,7 +2,7 @@
 #include <deque>
 #include <vector>
 #include <iomanip>
-#include "Stack.hpp"
+#include <stack>
 
 void	construct_test()
 {
@@ -10,11 +10,11 @@ void	construct_test()
 	std::deque<int> mydeque (3,100);          // deque with 3 elements
 	std::vector<int> myvector (2,200);        // vector with 2 elements
 
-	ft::Stack<int> first;                    				// empty stack
-	ft::Stack< int, std::deque<int> > second (mydeque);        	 // stack initialized to copy of deque
+	std::stack<int> first;                    				// empty stack
+	std::stack< int, std::deque<int> > second (mydeque);        	 // stack initialized to copy of deque
 
-	ft::Stack<int,std::vector<int> > third;  // empty stack using vector
-	ft::Stack<int,std::vector<int> > fourth (myvector);
+	std::stack<int,std::vector<int> > third;  // empty stack using vector
+	std::stack<int,std::vector<int> > fourth (myvector);
 
 	std::cout << "size of first: " << first.size() << '\n';
 	std::cout << "size of second: " << second.size() << '\n';
@@ -25,7 +25,7 @@ void	construct_test()
 void	empty_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "EMPTY" << std::endl;
-	ft::Stack<int> mystack;
+	std::stack<int> mystack;
 	int sum (0);
 
 	for (int i=1;i<=10;i++) mystack.push(i);
@@ -42,7 +42,7 @@ void	empty_test()
 void	size_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "SIZE" << std::endl;
-	ft::Stack<int> myints;
+	std::stack<int> myints;
 	std::cout << "0. size: " << myints.size() << '\n';
 
 	for (int i=0; i<5; i++) myints.push(i);
@@ -55,7 +55,7 @@ void	size_test()
 void	top_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "TOP" << std::endl;
-	ft::Stack<int> mystack;
+	std::stack<int> mystack;
 
 	mystack.push(10);
 	mystack.push(20);
@@ -68,7 +68,7 @@ void	top_test()
 void	push_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "PUSH" << std::endl;
-	ft::Stack<int> mystack;
+	std::stack<int> mystack;
 	int	myint;
 
 	for (myint = 3; myint < 10; ++myint)
@@ -82,7 +82,7 @@ void	push_test()
 void	pop_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "POP" << std::endl;
-	ft::Stack<int> mystack;
+	std::stack<int> mystack;
 	int		myint;
 
 	

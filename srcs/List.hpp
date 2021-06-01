@@ -7,6 +7,17 @@
 
 namespace ft
 {
+
+	template <typename U>
+	void			swap(U &x, U &y)
+	{
+		U	temp;
+
+		temp = x;
+		x = y;
+		y = temp;
+	}
+
 	template <class InputIterator1, class InputIterator2>
 	bool			lexicographical_compare ( InputIterator1 first1, InputIterator1 last1,
 											InputIterator2 first2, InputIterator2 last2)
@@ -62,7 +73,6 @@ namespace ft
 		node_allocator		_node_alloc;
 		allocator_type		_allocator;
 		Node<T>*			_end;
-		size_t				_size;
 
 		void		list_private(int n, int val)
 		{
@@ -109,7 +119,7 @@ namespace ft
 		void				insert_private(iterator position, int n, int val)
 		{
 			for (size_type i = 0; i < n; ++i)
-				insert(position, val);
+				position = insert(position, val);
 		}
 
 		template <class InputIterator>
@@ -117,24 +127,25 @@ namespace ft
 		{
 			while (first != last)
 			{
-				insert(position, *first);
+				position = insert(position, *first);
 				++first;
-				++position;
 			}
 		}
 
-		template <typename U>
-		void			swap(U &x, U &y)
-		{
-			U	temp;
 
-			temp = x;
-			x = y;
-			y = temp;
-		}
+		// void				connect(iterator iter1, iterator iter2)
+		// {
+		// 	iter2._element->_prev->_next = iter2._element->_next;
+		// 	iter2._element->_next->_prev = iter2._element->_prev;
+		// 	iter1._element->_next->_prev = iter2._element;
+		// 	iter2._element->_next = iter1._element->_next;
+		// 	iter1._element->_next = iter2._element;
+		// 	iter2._element->_prev = iter1._element;
+		// }
+
 
 	public:
-		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _end(0)
+		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc), _end(0)
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
@@ -142,7 +153,7 @@ namespace ft
 			_end->_next = _end;
 		}
 
-		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _end(0)
+		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _end(0)
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
@@ -153,12 +164,12 @@ namespace ft
 		}
 
 		template <typename InputIterator>
-		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc), _size(0), _end(0)
+		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc), _end(0)
 		{
 			list_private(first, last);
 		}
 
-		List(const List &copy) : _allocator(copy._allocator), _size(0), _end(0)
+		List(const List &copy) : _allocator(copy._allocator), _end(0)
 		{
 			iterator		iter;
 
@@ -317,7 +328,17 @@ namespace ft
 
 		size_type			size() const
 		{
-			return (_size);
+			iterator	iter;
+			size_type	ret;
+
+			ret = 0;
+			iter = begin();
+			while (iter != end())
+			{
+				++iter;
+				++ret;
+			}
+			return (ret);
 		}
 
 		// Return maximum size
@@ -347,7 +368,7 @@ namespace ft
 		// true if the container size is 0, false otherwise.
 		bool				empty() const
 		{
-			if (_size == 0)
+			if (size() == 0)
 				return (true);
 			else
 				return (false);
@@ -448,26 +469,14 @@ namespace ft
 // The storage for the new elements is allocated using the container's allocator, which may throw exceptions on failure (for the default allocator, bad_alloc is thrown if the allocation request does not succeed).
 		void	push_front(const value_type &val)
 		{
-			Node<T>*		temp;
+			Node<T>		*temp;
 
-			if (_size == 0)
-			{
-				_end->_next = _node_alloc.allocate(1);
-				_node_alloc.construct(_end->_next, val);
-				_end->_prev = _end->_next;
-				_end->_next->_prev = _end;
-				_end->_next->_next = _end;
-			}
-			else
-			{
-				temp = _end->_next;
-				_end->_next = _node_alloc.allocate(1);
-				_node_alloc.construct(_end->_next, val);
-				_end->_next->_next = temp;
-				_end->_next->_prev = _end;
-				temp->_prev = _end->_next;
-			}
-			++_size;
+			temp = _end->_next;
+			_end->_next = _node_alloc.allocate(1);
+			_node_alloc.construct(_end->_next, val);
+			_end->_next->_next = temp;
+			_end->_next->_prev = _end;
+			temp->_prev = _end->_next;
 		}
 
 // Delete last element
@@ -478,54 +487,33 @@ namespace ft
 		{
 			Node<T>*		temp;
 
-			if (_size == 0)
-				return ;
 			temp = _end->_next;
 			_end->_next = _end->_next->_next;
 			_end->_next->_prev = _end;
 			_node_alloc.destroy(temp);
 			_node_alloc.deallocate(temp, 1);
-			--_size;
 		}
 
 		void				push_back(const value_type &value)
 		{
-			if (_end->_prev == 0)
-			{
-				_end->_next = _node_alloc.allocate(1);
-				_node_alloc.construct(_end->_next, Node<T>(value));
-				_end->_next->_next = _end;
-				_end->_next->_prev = _end;
-				_end->_prev = _end->_next;
-			}
-			else
-			{
-				_end->_prev->_next = _node_alloc.allocate(1);
-				_node_alloc.construct(_end->_prev->_next, Node<T>(value));
-				_end->_prev->_next->_prev = _end->_prev;
-				_end->_prev = _end->_prev->_next;
-				_end->_prev->_next = _end;
-			}
-			++_size;
-
+			_end->_prev->_next = _node_alloc.allocate(1);
+			_node_alloc.construct(_end->_prev->_next, Node<T>(value));
+			((_end->_prev)->_next)->_prev = _end->_prev;
+			_end->_prev = _end->_prev->_next;
+			_end->_prev->_next = _end;
 		};
 
 		void				pop_back()
 		{
-			if (_end->_next == 0)
-				return ;
-			else
-			{
-				Node<T>		*temp;
+			Node<T>		*temp;
 
-				temp = _end->_prev;
-				_end->_prev = _end->_prev->_prev;
-				_end->_prev->_next = _end;
-				_node_alloc.destroy(temp);
-				_node_alloc.deallocate(temp, 1);
-				--_size;
-			}
+			temp = _end->_prev;
+			_end->_prev = _end->_prev->_prev;
+			_end->_prev->_next = _end;
+			_node_alloc.destroy(temp);
+			_node_alloc.deallocate(temp, 1);
 		}
+
 
 		iterator			insert(iterator position, const value_type &val)
 		{
@@ -537,14 +525,13 @@ namespace ft
 			temp._element->_next = position._element->_prev;
 			position._element->_prev->_next = position._element;
 			position._element->_prev->_prev = temp._element;
-			++_size;
-			return (temp);
+			return (temp._element->_next);
 		}
 
 		void				insert(iterator position, size_type n, const value_type& val)
 		{
 			for (size_type i = 0; i < n; ++i)
-				insert(position, val);
+				position = insert(position, val);
 		}
 
 		template <class InputIterator>
@@ -555,28 +542,14 @@ namespace ft
 
 		iterator			erase(iterator position)
 		{
-			Node<T>*		temp;
+			iterator		ret;
 
-			temp = position._element->_next;
-			if (position == begin())
-			{
-				_end->_next = position._element->_next;
-				position._element->_prev->_next = position._element->_next;
-				position._element->_next->_prev = position._element->_prev;
-				_node_alloc.destroy(position._element);
-				_node_alloc.deallocate(position._element, 1);
-				--_size;
-				return (end());
-			}
-			else
-			{
-				position._element->_prev->_next = position._element->_next;
-				position._element->_next->_prev = position._element->_prev;
-				_node_alloc.destroy(position._element);
-				_node_alloc.deallocate(position._element, 1);
-				--_size;
-				return (position._element->_next);
-			}
+			ret = position._element->_next;
+			position._element->_prev->_next = position._element->_next;
+			position._element->_next->_prev = position._element->_prev;
+			_node_alloc.destroy(position._element);
+			_node_alloc.deallocate(position._element, 1);
+			return (ret);
 		}
 
 		iterator			erase(iterator first, iterator last)
@@ -591,9 +564,8 @@ namespace ft
 		
 		void				swap(List& x)
 		{
-			swap(this->_allocator, x._allocator);
-			swap(this->_end, x._end);
-			swap(this->_size, x._size);
+			ft::swap(this->_allocator, x._allocator);
+			ft::swap(this->_end, x._end);
 		}
 
 // Clear content
@@ -601,9 +573,13 @@ namespace ft
 
 		void				clear()
 		{
-			while (_size)
+			iterator	iter;
+
+			iter = begin();
+			while (iter != end())
 			{
 				pop_back();
+				++iter;
 			}
 		};
 
@@ -633,16 +609,16 @@ namespace ft
 // In case of growth, the storage for the new elements is allocated using the container's allocator, which may throw exceptions on failure (for the default allocator, bad_alloc is thrown if the allocation request does not succeed).
 		void resize (size_type n, value_type val = value_type())
 		{
-			if (n < _size)
+			if (n < size())
 			{
-				while (n < _size)
+				while (n < size())
 				{
 					pop_back();
 				}
 			}
 			else
 			{
-				while (n > _size)
+				while (n > size())
 				{
 					push_back(val);
 				}
@@ -677,36 +653,42 @@ namespace ft
 //     Notice that the range includes all the elements between first and last, including the element pointed by first but not the one pointed by last.
 //     Member types iterator and const_iterator are bidirectional iterator types that point to elements.
 
-		void connect(iterator first_node, iterator second_node)
-		{
-			first_node._element->_next = second_node._element;
-			second_node._element->_prev = first_node._element;
-		}
-
 		void splice (iterator position, List& x) // entire list (1)
 		{
-			connect(position._element->_prev, x.begin());
-			connect((x.end())._element->_prev, position);
-			_size += x.size();
-			x._size = 0;
+			position._element->_prev->_next = x.begin()._element;
+			x.begin()._element->_prev = position._element->_prev;
+			position._element->_prev = x.end()._element->_prev;
+			x.end()._element->_prev->_next = position._element;
+
+			x.end()._element->_prev = x.end()._element;
+			x.end()._element->_next = x.end()._element;
 		}
 
 		void splice (iterator position, List& x, iterator i) // single element (2)
 		{
-			connect(position._element->_prev, i);
-			connect(i, position);
-			--(x._size);
-			++_size;
+			i._element->_prev->_next = i._element->_next;
+			i._element->_next->_prev = i._element->_prev;
+
+			position._element->_prev->_next = i._element;
+			i._element->_prev = position._element->_prev;
+			position._element->_prev = i._element;
+			i._element->_next = position._element;
 		}
 
 		void splice (iterator position, List& x, iterator first, iterator last) // element range (3)
 		{
-			while (first != last)
-			{
-				splice(position, x, first);
-				++first;
-				++position;
-			}
+			Node<T>		*temp;
+
+			first._element->_prev->_next = last._element;
+			temp = first._element->_prev;
+
+			position._element->_prev->_next = first._element;
+			first._element->_prev = position._element->_prev;
+
+			position._element->_prev = last._element->_prev;
+			last._element->_prev->_next = position._element;
+
+			last._element->_prev = temp;
 		}
 
 // Remove elements with specific value
@@ -725,7 +707,7 @@ namespace ft
 		{
 			iterator	iter;
 
-			if (_size == 0)
+			if (size() == 0)
 				return ;
 			iter = begin();
 			while (iter != end())
@@ -756,7 +738,7 @@ namespace ft
 		{
 			iterator	iter;
 
-			if (_size == 0)
+			if (size() == 0)
 				return ;
 			iter = begin();
 			while (iter != end())
@@ -791,7 +773,7 @@ namespace ft
 		{
 			iterator	iter;
 
-			if (_size == 0)
+			if (size() == 0)
 				return ;
 			iter = _end->_next->_next;
 			while (iter != end())
@@ -807,7 +789,7 @@ namespace ft
 		{
 			iterator	iter;
 
-			if (_size == 0)
+			if (size() == 0)
 				return ;
 			iter = _end->_next->_next;
 			while (iter != end())
@@ -849,7 +831,7 @@ namespace ft
 
 			sort();
 			x.sort();
-			if (_size == 0 || x.size() == 0)
+			if (size() == 0 || x.size() == 0)
 				return ;
 			iter = x.begin();
 			iter2 = begin();
@@ -870,7 +852,7 @@ namespace ft
 
 			sort();
 			x.sort();
-			if (_size == 0 || x.size() == 0)
+			if (size() == 0 || x.size() == 0)
 				return ;
 			iter = x.begin();
 			iter2 = begin();
@@ -907,12 +889,41 @@ namespace ft
 			Node<T>*			temp;
 
 			iter = begin();
+			while (iter != end())
+			{
+				iter2 = iter._element->_next;
+				while (iter2 != end())
+				{
+					if (*iter2 < *iter)
+					{
+						iter._element->_prev->_next = iter2._element;
+						iter._element->_next->_prev = iter._element->_prev;
+						iter2._element->_next->_prev = iter._element;
+						iter._element->_next = iter2._element->_next;
+
+						iter2._element->_next = iter._element;
+						iter._element->_prev = iter2._element;
+					}
+					++iter2;
+				}
+				++iter;
+			}
+		}
+
+		template <class Compare>
+		void sort (Compare comp)
+		{
+			iterator		iter;
+			iterator		iter2;
+			Node<T>			*temp;
+
+			iter = begin();
 			while (iter != --end())
 			{
 				iter2 = iter._element->_next;
 				while (iter2 != end())
 				{
-					if (*iter < *iter2)
+					if (comp(*iter, *iter2))
 					{
 						iter._element->_prev->_next = iter2._element;
 						iter._element->_next->_prev = iter2._element;
@@ -928,54 +939,25 @@ namespace ft
 			}
 		}
 
-		template <class Compare>
-		void sort (Compare comp)
-		{
-			iterator		iter;
-			iterator		iter2;
-			Node<T>*			temp;
-
-			iter = begin();
-			while (iter != --end())
-			{
-				iter2 = iter._element->_next;
-				while (iter2 != end())
-				{
-					if (comp(*iter, *iter2))
-					{
-						iter->_prev->_next = iter2._element;
-						iter->_next->_prev = iter2._element;
-						iter2->_prev->_next = iter._element;
-						iter2->_next->_prev = iter._element;
-						temp = iter->_next;
-						iter->_next = iter2->_next;
-						iter2->_next = temp;
-					}
-					++iter2;
-				}
-				++iter;
-			}
-		}
-
 
 // Reverse the order of elements
 // Reverses the order of the elements in the list container.
 		void reverse()
 		{
 			iterator	iter;
-			Node<T>*		temp;
+			Node<T>		*temp;
 
 			iter = begin();
 			while (iter != end())
 			{
-				temp = iter->_prev;
-				iter->_prev = iter->_next;
-				iter->_next = temp;
+				temp = iter._element->_prev;
+				iter._element->_prev = iter._element->_next;
+				iter._element->_next = temp;
 				++iter;
 			}
-			temp = iter->_prev;
-			iter->_prev = iter->_next;
-			iter->_next = temp;
+			temp = iter._element->_prev;
+			iter._element->_prev = iter._element->_next;
+			iter._element->_next = temp;
 		}
 
 // Get allocator

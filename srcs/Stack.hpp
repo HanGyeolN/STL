@@ -34,9 +34,9 @@ namespace ft
 		Container				_container;
 
 	public:
-		typedef T				value_type;
-		typedef Container		container_type;
-		typedef size_t			size_type;
+		typedef T								value_type;
+		typedef Container						container_type;
+		typedef size_t							size_type;
 
 	public:
 // Construct stack

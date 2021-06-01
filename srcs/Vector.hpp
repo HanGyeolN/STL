@@ -1,7 +1,6 @@
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
-# include <iostream>
 # include <memory>
 # include "VectorIterator.hpp"
 # include "ReverseVectorIterator.hpp"
@@ -73,8 +72,10 @@ namespace ft
 
 		Vector				&operator=(const Vector &copy)
 		{
-			clear();
 			size_type		i;
+
+			clear();
+			_allocator.deallocate(_begin, _capacity);
 
 			i = 0;
 			_begin = _allocator.allocate(_capacity);
@@ -164,11 +165,7 @@ namespace ft
 			y = temp;
 		}
 
-		template <typename X>
-		void				private_vector(X first, X last);
-
-		template <>
-		void				private_vector<int>(int n, int val)
+		void				private_vector(int n, int val)
 		{
 			size_type		i;
 
@@ -181,13 +178,22 @@ namespace ft
 			}
 		}
 
-		
+		template <typename X>
+		void				private_vector(X first, X last)
+		{
+			_begin = _allocator.allocate(_capacity);
+			while (first != last)
+			{
+				push_back(*first);
+				first++;
+			}
+		}
 
 		void				insert_private(iterator position, int n, int val)
 		{
 			for (size_type i = 0; i < n; ++i)
 			{
-				insert(position, val);
+				position = insert(position, val);
 			}
 		}
 
@@ -196,7 +202,7 @@ namespace ft
 		{
 			while (first != last)
 			{
-				insert(position, *first);
+				position = insert(position, *first);
 				++position;
 				++first;
 			}
@@ -235,28 +241,16 @@ ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(0), _size(
 
 // n만큼 공간을 할당받고 val로 할당받은 공간에 construct 한다.
 template <typename T, typename Alloc>
-ft::Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _capacity(n), _size(n), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _capacity(n), _size(0), _allocator(alloc)
 {
 	size_type		i;
 
 	_begin = _allocator.allocate(_capacity);
 	i = 0;
-	while (i < n)
+	while (i < static_cast<size_type>(n))
 	{
-		push_back(val);
+		push_back(static_cast<value_type>(val));
 		++i;
-	}
-}
-
-template <typename T, typename Alloc>
-	template <typename X>
-void		ft::Vector<T, Alloc>::private_vector(X first, X last)
-{
-	_begin = _allocator.allocate(_capacity);
-	while (first != last)
-	{
-		push_back(*first);
-		first++;
 	}
 }
 
@@ -532,30 +526,50 @@ void				ft::Vector<T, Alloc>::pop_back()
 template <typename T, typename Alloc>
 typename ft::Vector<T, Alloc>::iterator			ft::Vector<T, Alloc>::insert(iterator position, const value_type &val)
 {
+	size_type	cnt;
 	value_type	front;
 	value_type	temp;
 
-	if (position != end()) // 끝이 아니라면
+	cnt = 0;
+	if (position != this->end()) // 끝이 아니라면
 	{
 		front = *position;
 		*position = val;
-		position++;
-		
-		while (position != end())
+		++position;
+		++cnt;
+		while (position != this->end())
 		{
-			
 			temp = *position;
 			*position = front;
-			position++;
+			++position;
+			++cnt;
 			front = temp;
 		}
-		push_back(front);
+		++_size;
+		if (_size > _capacity)
+		{
+			reserve(_capacity * 2);
+			_allocator.construct((_begin + _size - 1), front);
+		}
+		else
+		{
+			_allocator.construct((_begin + _size - 1), front);
+		}
 	}
 	else
 	{
-		push_back(val);
+		++_size;
+		if (_size > _capacity)
+		{
+			reserve(_capacity * 2);
+			_allocator.construct((_begin + _size - 1), front);
+		}
+		else
+		{
+			_allocator.construct((_begin + _size - 1), front);
+		}
 	}
-	return (_begin);
+	return (this->end() - cnt - 1);
 }
 
 // 
@@ -564,7 +578,7 @@ void				ft::Vector<T, Alloc>::insert(iterator position, size_type n, const value
 {
 	for (size_type i = 0; i < n; ++i)
 	{
-		insert(position, val);
+		position = insert(position, val);
 	}
 }
 

@@ -9,9 +9,9 @@ namespace ft
 	class Queue
 	{
 	public:
-		typedef	T			value_type;
-		typedef Container	container_type;
-		typedef size_t		size_type;
+		typedef	T								value_type;
+		typedef Container						container_type;
+		typedef size_t							size_type;
 
 	public:
 		explicit		Queue(const container_type& ctnr = container_type()) 
