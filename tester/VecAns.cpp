@@ -1,4 +1,3 @@
-#include "Vector.hpp"
 #include <vector>
 #include <iomanip>
 #include <iostream>
@@ -7,85 +6,85 @@ int main(void)
 {
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "CONSTRUCT" << std::endl;
-		ft::Vector<int> first;                                // empty Vector of ints
-		ft::Vector<int> second (4,100);              // four ints with value 100
-		ft::Vector<int> third (second.begin(),second.end());  // iterating through second
-		ft::Vector<int> fourth (third);                       // a copy of third
+		std::vector<int> first;                                // empty Vector of ints
+		std::vector<int> second (4,100);              // four ints with value 100
+		std::vector<int> third (second.begin(),second.end());  // iterating through second
+		std::vector<int> fourth (third);                       // a copy of third
 
 		// the iterator constructor can also be used to construct from arrays:
 		int myints[] = {16,2,77,29};
 		std::cout << "fifth" << std::endl;
-		ft::Vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
+		std::vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int) );
 
 		std::cout << "The contents of fifth are:";
-		for (ft::Vector<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
+		for (std::vector<int>::iterator it = fifth.begin(); it != fifth.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "OPERATOR=" << std::endl;
-		ft::Vector<int> foo (3,0);
-		ft::Vector<int> bar (5,0);
+		std::vector<int> foo (3,0);
+		std::vector<int> bar (5,0);
 
 		bar = foo;
-		foo = ft::Vector<int>();
+		foo = std::vector<int>();
 
 		std::cout << "Size of foo: " << int(foo.size()) << '\n';
 		std::cout << "Size of bar: " << int(bar.size()) << '\n';
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "BEGIN" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 		for (int i=1; i<=5; i++) myVector.push_back(i);
 
 		std::cout << "myVector contains:";
-		for (ft::Vector<int>::iterator it = myVector.begin() ; it != myVector.end(); ++it)
+		for (std::vector<int>::iterator it = myVector.begin() ; it != myVector.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "END" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 		for (int i=1; i<=5; i++) myVector.push_back(i);
 
 		std::cout << "myVector contains:";
-		for (ft::Vector<int>::iterator it = myVector.begin() ; it != myVector.end(); ++it)
+		for (std::vector<int>::iterator it = myVector.begin() ; it != myVector.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "RBEGIN" << std::endl;
-		ft::Vector<int> myVector (5);  // 5 default-constructed ints
+		std::vector<int> myVector (5);  // 5 default-constructed ints
 
 		int i=0;
 
-		ft::Vector<int>::reverse_iterator rit = myVector.rbegin();
+		std::vector<int>::reverse_iterator rit = myVector.rbegin();
 		for (; rit!= myVector.rend(); ++rit)
 			*rit = ++i;
 
 		std::cout << "myVector contains:";
-		for (ft::Vector<int>::iterator it = myVector.begin(); it != myVector.end(); ++it)
+		for (std::vector<int>::iterator it = myVector.begin(); it != myVector.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "REND" << std::endl;
-		ft::Vector<int> myVector (5);  // 5 default-constructed ints
+		std::vector<int> myVector (5);  // 5 default-constructed ints
 
-		ft::Vector<int>::reverse_iterator rit = myVector.rbegin();
+		std::vector<int>::reverse_iterator rit = myVector.rbegin();
 
 		int i=0;
 		for (rit = myVector.rbegin(); rit!= myVector.rend(); ++rit)
 			*rit = ++i;
 
 		std::cout << "myVector contains:";
-		for (ft::Vector<int>::iterator it = myVector.begin(); it != myVector.end(); ++it)
+		for (std::vector<int>::iterator it = myVector.begin(); it != myVector.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "SIZE" << std::endl;
-		ft::Vector<int> myints;
+		std::vector<int> myints;
 		std::cout << "0. size: " << myints.size() << '\n';
 
 		for (int i=0; i<10; i++) myints.push_back(i);
@@ -99,7 +98,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "MAX_SIZE" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 
 		// set some content in the Vector:
 		for (int i=0; i<100; i++) myVector.push_back(i);
@@ -110,7 +109,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "RESIZE" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 
 		// set some initial content:
 		for (std::size_t i=1;i<10;i++) myVector.push_back(i);
@@ -126,7 +125,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "CAPACITY" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 
 		// set some content in the Vector:
 		for (int i=0; i<100; i++) myVector.push_back(i);
@@ -137,7 +136,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "EMPTY" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 		int sum (0);
 
 		for (int i=1;i<=10;i++) myVector.push_back(i);
@@ -152,21 +151,20 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "RESERVE" << std::endl;
-		ft::Vector<int>::size_type sz;
+		std::vector<int>::size_type sz;
 
-		ft::Vector<int> foo;
+		std::vector<int> foo;
 		sz = foo.capacity();
 		std::cout << "making foo grow:\n";
 		for (int i=0; i<100; ++i) {
 			foo.push_back(i);
-			// std::cout << "i: " << i << ", cap: " << foo.capacity() << ", size: " << foo.size() << '\n';
 			if (sz!=foo.capacity()) {
 				sz = foo.capacity();
 				std::cout << "capacity changed: " << sz << '\n';
 			}
 		}
 
-		ft::Vector<int> bar;
+		std::vector<int> bar;
 		sz = bar.capacity();
 		bar.reserve(100);   // this is the only difference with foo above
 		std::cout << "making bar grow:\n";
@@ -180,9 +178,9 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "OPERATOR[]" << std::endl;
-		ft::Vector<int> myVector (10);   // 10 zero-initialized elements
+		std::vector<int> myVector (10);   // 10 zero-initialized elements
 
-		ft::Vector<int>::size_type sz = myVector.size();
+		std::vector<int>::size_type sz = myVector.size();
 
 		// assign some values:
 		for (unsigned i=0; i<sz; i++) myVector[i]=i;
@@ -203,7 +201,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "AT" << std::endl;
-		ft::Vector<int> myVector (10);   // 10 zero-initialized ints
+		std::vector<int> myVector (10);   // 10 zero-initialized ints
 
 		// assign some values:
 		for (unsigned i=0; i<myVector.size(); i++)
@@ -216,7 +214,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "FRONT" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 
 		myVector.push_back(78);
 		myVector.push_back(16);
@@ -229,7 +227,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "BACK" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 
 		myVector.push_back(10);
 
@@ -245,13 +243,13 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "ASSIGN" << std::endl;
-		ft::Vector<int> first;
-		ft::Vector<int> second;
-		ft::Vector<int> third;
+		std::vector<int> first;
+		std::vector<int> second;
+		std::vector<int> third;
 
 		first.assign (7,100);             // 7 ints with a value of 100
 
-		ft::Vector<int>::iterator it;
+		std::vector<int>::iterator it;
 		it=first.begin()+1;
 
 		second.assign (it,first.end()-1); // the 5 central values of first
@@ -265,7 +263,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "PUSH_BACK" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 
 		for (int i = 0; i < 10; ++i)
 			myVector.push_back (i);
@@ -274,7 +272,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "POP_BACK" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 		int sum (0);
 		myVector.push_back (100);
 		myVector.push_back (200);
@@ -290,8 +288,8 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "INSERT" << std::endl;
-		ft::Vector<int> myVector (3,100);
-		ft::Vector<int>::iterator it;
+		std::vector<int> myVector (3,100);
+		std::vector<int>::iterator it;
 
 		it = myVector.begin();
 		it = myVector.insert ( it , 200 );
@@ -301,7 +299,7 @@ int main(void)
 		// "it" no longer valid, get a new one:
 		it = myVector.begin();
 
-		ft::Vector<int> anotherVector (2,400);
+		std::vector<int> anotherVector (2,400);
 		myVector.insert (it+2,anotherVector.begin(),anotherVector.end());
 
 		int myarray [] = { 501,502,503 };
@@ -314,7 +312,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "ERASE" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 
 		// set some values (from 1 to 10)
 		for (int i=1; i<=10; i++) myVector.push_back(i);
@@ -331,8 +329,8 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "SWAP" << std::endl;
-		ft::Vector<int> foo (3,100);   // three ints with a value of 100
-		ft::Vector<int> bar (5,200);   // five ints with a value of 200
+		std::vector<int> foo (3,100);   // three ints with a value of 100
+		std::vector<int> bar (5,200);   // five ints with a value of 200
 
 		foo.swap(bar);
 
@@ -348,7 +346,7 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "CLEAR" << std::endl;
-		ft::Vector<int> myVector;
+		std::vector<int> myVector;
 		myVector.push_back (100);
 		myVector.push_back (200);
 		myVector.push_back (300);
@@ -369,8 +367,8 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "RELATIONAL" << std::endl;
-		ft::Vector<int> foo (3,100);   // three ints with a value of 100
-		ft::Vector<int> bar (2,200);   // two ints with a value of 200
+		std::vector<int> foo (3,100);   // three ints with a value of 100
+		std::vector<int> bar (2,200);   // two ints with a value of 200
 
 		if (foo==bar) std::cout << "foo and bar are equal\n";
 		if (foo!=bar) std::cout << "foo and bar are not equal\n";
@@ -381,24 +379,24 @@ int main(void)
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "SWAP" << std::endl;
-		ft::Vector<int> foo (3,100);   // three ints with a value of 100
-		ft::Vector<int> bar (5,200);   // five ints with a value of 200
+		std::vector<int> foo (3,100);   // three ints with a value of 100
+		std::vector<int> bar (5,200);   // five ints with a value of 200
 
 		foo.swap(bar);
 
 		std::cout << "foo contains:";
-		for (ft::Vector<int>::iterator it = foo.begin(); it!=foo.end(); ++it)
+		for (std::vector<int>::iterator it = foo.begin(); it!=foo.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 
 		std::cout << "bar contains:";
-		for (ft::Vector<int>::iterator it = bar.begin(); it!=bar.end(); ++it)
+		for (std::vector<int>::iterator it = bar.begin(); it!=bar.end(); ++it)
 			std::cout << ' ' << *it;
 		std::cout << '\n';
 	}
 	{
 		std::cout << std::setfill('-') << std::setw(20) << "ERASE" << std::endl;
-		ft::Vector<int>		a;
+		std::vector<int>		a;
 		std::vector<int>	b;
 
 		a.push_back(1);

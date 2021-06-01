@@ -228,7 +228,7 @@ namespace ft
 
 // 기본생성자, allocator로 기본 용량만큼 할당받고 끝
 template <typename T, typename Alloc>
-ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(100), _size(0), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(0), _size(0), _allocator(alloc)
 {
 	_begin = _allocator.allocate(_capacity);
 }
@@ -265,7 +265,7 @@ void		ft::Vector<T, Alloc>::private_vector(X first, X last)
 // 레퍼런스 참고
 template <typename T, typename Alloc>
 	template <typename InputIterator>
-ft::Vector<T, Alloc>::Vector(InputIterator first, InputIterator last, const allocator_type& alloc) : _capacity(10), _size(0), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(InputIterator first, InputIterator last, const allocator_type& alloc) : _capacity(1), _size(0), _allocator(alloc)
 {
 	private_vector(first, last);
 }
@@ -380,17 +380,25 @@ bool				ft::Vector<T, Alloc>::empty() const
 template <typename T, typename Alloc>
 void				ft::Vector<T, Alloc>::reserve(size_type n)
 {
+	if (n == 0)
+		n = 1;
 	if (n > _capacity)
 	{
 		pointer		temp;
+		size_type	temp_size;
 
-		temp = _allocator.allocate(n);
-		for (size_t i = 0; i < _size; i++)
-			_allocator.construct(temp + i, *(_begin + i));
-		clear();
-		_allocator.deallocate(_begin, _capacity);
-		_begin = temp;
-		_capacity = n;
+		if (n > _capacity)
+		{
+			temp = _allocator.allocate(n);
+			for (size_t i = 0; i < _size; i++)
+				_allocator.construct(temp + i, *(_begin + i));
+			temp_size = _size;
+			clear();
+			_allocator.deallocate(_begin, _capacity);
+			_size = temp_size;
+			_begin = temp;
+			_capacity = n;
+		}
 	}
 }
 
@@ -500,7 +508,8 @@ void					ft::Vector<T, Alloc>::push_back(const value_type &value)
 	else
 	{
 		reserve(_capacity * 2);
-		push_back(value);
+		_allocator.construct((_begin + _size), value);
+		++_size;
 	}
 }
 

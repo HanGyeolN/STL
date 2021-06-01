@@ -677,33 +677,24 @@ namespace ft
 //     Notice that the range includes all the elements between first and last, including the element pointed by first but not the one pointed by last.
 //     Member types iterator and const_iterator are bidirectional iterator types that point to elements.
 
+		void connect(iterator first_node, iterator second_node)
+		{
+			first_node._element->_next = second_node._element;
+			second_node._element->_prev = first_node._element;
+		}
+
 		void splice (iterator position, List& x) // entire list (1)
 		{
-			Node<T>		*temp;
-
-			temp = position._element->_next;
-			position._element->_next = x._end->_next;
-			(x._end->_next)->_prev = position._element;
-
-			temp->_prev = x._end->_prev;
-			x._end->_next = temp;
-
-			x._end->_next = x._end;
-			x._end->_prev = x._end;
+			connect(position._element->_prev, x.begin());
+			connect((x.end())._element->_prev, position);
 			_size += x.size();
 			x._size = 0;
 		}
 
 		void splice (iterator position, List& x, iterator i) // single element (2)
 		{
-			Node<T>		*temp;
-			temp = position._element->_next;
-			position._element->_next = i._element;
-			i._element->_prev = position._element;
-
-			i._element->_next = temp;
-			temp->_prev = i._element;
-
+			connect(position._element->_prev, i);
+			connect(i, position);
 			--(x._size);
 			++_size;
 		}
@@ -713,7 +704,6 @@ namespace ft
 			while (first != last)
 			{
 				splice(position, x, first);
-				++_size;
 				++first;
 				++position;
 			}
