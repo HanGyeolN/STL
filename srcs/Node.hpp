@@ -23,7 +23,7 @@ public:
 };
 
 template <typename T>
-Node<T>::Node() : _data(0), _next(0), _prev(0)
+Node<T>::Node() : _data(), _next(0), _prev(0)
 {
 }
 

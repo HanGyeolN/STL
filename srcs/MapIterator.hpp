@@ -36,12 +36,12 @@ public:
 	~MapIterator()
 	{};
 
-	bool				operator==(const MapIterator &)
+	bool				operator==(const MapIterator &ref)
 	{
 		return (this->_element == ref._element);
 	};
 
-	bool				operator!=(const MapIterator &)
+	bool				operator!=(const MapIterator &ref)
 	{
 		return !(this->_element == ref._element);
 	};

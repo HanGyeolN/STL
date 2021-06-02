@@ -80,7 +80,7 @@ namespace ft
 			_node_alloc.construct(_end, Node<T>());
 			_end->_prev = _end;
 			_end->_next = _end;
-			for (size_type i = 0; i < n; ++i)
+			for (int i = 0; i < n; ++i)
 				push_back(val);
 		}
 
@@ -101,7 +101,7 @@ namespace ft
 		void				assign_private(int n, int val)
 		{
 			clear();
-			for (size_type i = 0; i < n; ++i)
+			for (int i = 0; i < n; ++i)
 				push_back(val);
 		}
 
@@ -118,7 +118,7 @@ namespace ft
 
 		void				insert_private(iterator position, int n, int val)
 		{
-			for (size_type i = 0; i < n; ++i)
+			for (int i = 0; i < n; ++i)
 				position = insert(position, val);
 		}
 
@@ -145,7 +145,7 @@ namespace ft
 
 
 	public:
-		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc), _end(0)
+		explicit List(const allocator_type& alloc = allocator_type()) : _allocator(alloc)
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
@@ -153,7 +153,7 @@ namespace ft
 			_end->_next = _end;
 		}
 
-		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc), _end(0)
+		explicit List(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _allocator(alloc)
 		{
 			_end = _node_alloc.allocate(1);
 			_node_alloc.construct(_end, Node<T>());
@@ -164,12 +164,12 @@ namespace ft
 		}
 
 		template <typename InputIterator>
-		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc), _end(0)
+		List(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _allocator(alloc)
 		{
 			list_private(first, last);
 		}
 
-		List(const List &copy) : _allocator(copy._allocator), _end(0)
+		List(const List &copy) : _allocator(copy._allocator)
 		{
 			iterator		iter;
 
@@ -574,13 +574,18 @@ namespace ft
 		void				clear()
 		{
 			iterator	iter;
+			iterator	next;
 
 			iter = begin();
 			while (iter != end())
 			{
-				pop_back();
-				++iter;
+				next = iter._element->_next;
+				_node_alloc.destroy(iter._element);
+				_node_alloc.deallocate(iter._element, 1);
+				iter = next;
 			}
+			_end->_next = _end;
+			_end->_prev = _end;
 		};
 
 // Change size
@@ -666,6 +671,8 @@ namespace ft
 
 		void splice (iterator position, List& x, iterator i) // single element (2)
 		{
+			if (x.empty())
+				return ;
 			i._element->_prev->_next = i._element->_next;
 			i._element->_next->_prev = i._element->_prev;
 
@@ -679,6 +686,8 @@ namespace ft
 		{
 			Node<T>		*temp;
 
+			if (x.empty())
+				return ;
 			first._element->_prev->_next = last._element;
 			temp = first._element->_prev;
 
@@ -802,17 +811,28 @@ namespace ft
 
 
 // Merge sorted lists
-// Merges x into the list by transferring all of its elements at their respective ordered positions into the container (both containers shall already be ordered).
+// Merges x into the list by transferring all of its elements at their respective 
+// ordered positions into the container (both containers shall already be ordered).
 
-// This effectively removes all the elements in x (which becomes empty), and inserts them into their ordered position within container (which expands in size by the number of elements transferred). The operation is performed without constructing nor destroying any element: they are transferred, no matter whether x is an lvalue or an rvalue, or whether the value_type supports move-construction or not.
+// This effectively removes all the elements in x (which becomes empty), 
+// and inserts them into their ordered position within container 
+// (which expands in size by the number of elements transferred).  
+// The operation is performed without constructing nor destroying any element: they are transferred, 
+// no matter whether x is an lvalue or an rvalue, or whether the value_type supports move-construction or not.
 
-// The template versions with two parameters (2), have the same behavior, but take a specific predicate (comp) to perform the comparison operation between elements. This comparison shall produce a strict weak ordering of the elements 
+// The template versions with two parameters (2), have the same behavior, 
+// but take a specific predicate (comp) to perform the comparison operation between elements. 
+// This comparison shall produce a strict weak ordering of the elements 
 
 // (i.e., a consistent transitive comparison, without considering its reflexiveness).
 
-// This function requires that the list containers have their elements already ordered by value (or by comp) before the call. For an alternative on unordered lists, see list::splice.
+// This function requires that the list containers have their elements already ordered by value 
+// (or by comp) before the call. For an alternative on unordered lists, see list::splice.
 
-// Assuming such ordering, each element of x is inserted at the position that corresponds to its value according to the strict weak ordering defined by operator< or comp. The resulting order of equivalent elements is stable (i.e., equivalent elements preserve the relative order they had before the call, and existing elements precede those equivalent inserted from x).
+// Assuming such ordering, each element of x is inserted at the position that corresponds to 
+// its value according to the strict weak ordering defined by operator< or comp. 
+// The resulting order of equivalent elements is stable (i.e., equivalent elements preserve 
+// the relative order they had before the call, and existing elements precede those equivalent inserted from x).
 
 // The function does nothing if (&x == this).
 
@@ -826,42 +846,55 @@ namespace ft
 //     This shall be a function pointer or a function object.
 		void merge (List& x)
 		{
-			iterator	iter;
-			iterator	iter2;
+			iterator	base_iter;
+			iterator	x_iter;
+			iterator	x_next;
 
-			sort();
-			x.sort();
 			if (size() == 0 || x.size() == 0)
 				return ;
-			iter = x.begin();
-			iter2 = begin();
-			while (iter != x.end())
+			base_iter = begin();
+			while (base_iter != end())
 			{
-				while (*iter < *iter2 || iter2 == end())
-					++iter2;
-				splice(iter2, x, iter);
-				++iter;
+				x_iter = x.begin();
+				while (x_iter != x.end())
+				{
+					x_next = x_iter._element->_next;
+					if (*x_iter < *base_iter)
+						splice(base_iter, x, x_iter);
+					else
+						break;
+					x_iter = x_next;
+				}
+				++base_iter;
 			}
+			if (!x.empty())
+				splice(end(), x);
 		}
+
 
 		template <class Compare>
 		void merge (List& x, Compare comp)
 		{
-			iterator	iter;
-			iterator	iter2;
+			iterator	base_iter;
+			iterator	x_iter;
+			iterator	x_next;
 
-			sort();
-			x.sort();
 			if (size() == 0 || x.size() == 0)
 				return ;
-			iter = x.begin();
-			iter2 = begin();
-			while (iter != x.end())
+			base_iter = begin();
+			while (base_iter != end())
 			{
-				while (comp(*iter, *iter2) || iter2 == end())
-					++iter2;
-				splice(iter2, x, iter);
-				++iter;
+				x_iter = x.begin();
+				while (x_iter != x.end())
+				{
+					x_next = x_iter._element->_next;
+					if (comp(*x_iter, *base_iter))
+						splice(base_iter, x, x_iter);
+					else
+						break;
+					x_iter = x_next;
+				}
+				++base_iter;
 			}
 		}
 
@@ -882,60 +915,111 @@ namespace ft
 //     Binary predicate that, taking two values of the same type of those contained in the list, 
 //		returns true if the first argument goes before the second argument in the strict weak ordering it defines, and false otherwise.
 //     This shall be a function pointer or a function object.
+
+		void	swap_node_position(const iterator &iter, const iterator &iter2)
+		{
+			Node<T>		*next;
+			Node<T>		*prev;
+
+			next = iter._element->_next;
+			prev = iter._element->_prev;
+
+			if (iter._element->_next == iter2._element)
+			{
+				iter._element->_prev->_next = iter2._element;
+
+				iter._element->_next = iter2._element->_next;
+				iter._element->_prev = iter2._element;
+				
+				iter2._element->_next->_prev = iter._element;
+				
+				iter2._element->_next = iter._element;
+				iter2._element->_prev = prev;
+			}
+			else if (iter._element->_prev == iter2._element)
+			{
+				iter._element->_next->_prev = iter2._element;
+
+				iter._element->_next = iter2._element;
+				iter._element->_prev = iter2._element->_prev;
+				
+				iter2._element->_prev->_next = iter._element;
+				
+				iter2._element->_next = next;
+				iter2._element->_prev = iter._element;
+			}
+			else
+			{
+				iter._element->_prev->_next = iter2._element;
+				iter._element->_next->_prev = iter2._element;
+
+				iter._element->_next = iter2._element->_next;
+				iter._element->_prev = iter2._element->_prev;
+				
+				iter2._element->_prev->_next = iter._element;
+				iter2._element->_next->_prev = iter._element;
+				
+				iter2._element->_next = next;
+				iter2._element->_prev = prev;
+			}
+		}
+
 		void sort()
 		{
+			size_type		i;
+			size_type		len;
 			iterator		iter;
-			iterator		iter2;
-			Node<T>*			temp;
+			iterator		base;
+			iterator		min;
 
-			iter = begin();
-			while (iter != end())
+			i = 0;
+			len = size();
+			while (i < len)
 			{
-				iter2 = iter._element->_next;
-				while (iter2 != end())
+				iter = begin();
+				for (size_type n = 0; n < i; ++n)
+					iter = iter._element->_next;
+				base = iter;
+				min = iter;
+				while (iter != end())
 				{
-					if (*iter2 < *iter)
-					{
-						iter._element->_prev->_next = iter2._element;
-						iter._element->_next->_prev = iter._element->_prev;
-						iter2._element->_next->_prev = iter._element;
-						iter._element->_next = iter2._element->_next;
-
-						iter2._element->_next = iter._element;
-						iter._element->_prev = iter2._element;
-					}
-					++iter2;
+					if (*iter < *min)
+						min = iter;
+					++iter;
 				}
-				++iter;
+				if (min != base)
+					swap_node_position(min, base);
+				++i;
 			}
 		}
 
 		template <class Compare>
 		void sort (Compare comp)
 		{
+			size_type		i;
+			size_type		len;
 			iterator		iter;
-			iterator		iter2;
-			Node<T>			*temp;
+			iterator		base;
+			iterator		min;
 
-			iter = begin();
-			while (iter != --end())
+			i = 0;
+			len = size();
+			while (i < len)
 			{
-				iter2 = iter._element->_next;
-				while (iter2 != end())
+				iter = begin();
+				for (size_type n = 0; n < i; ++n)
+					iter = iter._element->_next;
+				base = iter;
+				min = iter;
+				while (iter != end())
 				{
-					if (comp(*iter, *iter2))
-					{
-						iter._element->_prev->_next = iter2._element;
-						iter._element->_next->_prev = iter2._element;
-						iter2._element->_prev->_next = iter._element;
-						iter2._element->_next->_prev = iter._element;
-						temp = iter._element->_next;
-						iter._element->_next = iter2._element->_next;
-						iter2._element->_next = temp;
-					}
-					++iter2;
+					if (comp(*iter, *min))
+						min = iter;
+					++iter;
 				}
-				++iter;
+				if (min != base)
+					swap_node_position(min, base);
+				++i;
 			}
 		}
 
@@ -953,7 +1037,7 @@ namespace ft
 				temp = iter._element->_prev;
 				iter._element->_prev = iter._element->_next;
 				iter._element->_next = temp;
-				++iter;
+				--iter;
 			}
 			temp = iter._element->_prev;
 			iter._element->_prev = iter._element->_next;

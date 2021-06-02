@@ -1,4 +1,4 @@
-#include "Map.hpp"
+#include <map>
 #include <iostream>
 #include <iomanip>
 
@@ -12,35 +12,35 @@ struct classcomp {
 void		construct_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "CONSTRUCT" << std::endl;
-	ft::Map<char,int> first;
+	std::map<char,int> first;
 
 	first['a']=10;
 	first['b']=30;
 	first['c']=50;
 	first['d']=70;
 
-	ft::Map<char,int> second (first.begin(),first.end());
+	std::map<char,int> second (first.begin(),first.end());
 
-	ft::Map<char,int> third (second);
+	std::map<char,int> third (second);
 
-	//ft::Map<char,int,classcomp> fourth;                 // class as Compare
+	//std::map<char,int,classcomp> fourth;                 // class as Compare
 
 	//bool(*fn_pt)(char,char) = fncomp;
-	//ft::Map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
+	//std::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
 }
 
 void		copy_operator_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "OPERATOR=" << std::endl;
-	ft::Map<char,int> first;
-	ft::Map<char,int> second;
+	std::map<char,int> first;
+	std::map<char,int> second;
 
 	first['x']=8;
 	first['y']=16;
 	first['z']=32;
 
 	second=first;                // second now contains 3 ints
-	first=ft::Map<char,int>();  // and first is now empty
+	first=std::map<char,int>();  // and first is now empty
 
 	std::cout << "Size of first: " << first.size() << '\n';
 	std::cout << "Size of second: " << second.size() << '\n';
@@ -49,28 +49,28 @@ void		copy_operator_test()
 void		begin_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "BEGIN, END" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
 	mymap['b'] = 100;
 	mymap['a'] = 200;
 	mymap['c'] = 300;
 
 	// show content:
-	for (ft::Map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+	for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 		std::cout << it->first << " => " << it->second << '\n';
 }
 
 void		rbegin_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "RBEGIN, REND" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
 	mymap['x'] = 100;
 	mymap['y'] = 200;
 	mymap['z'] = 300;
 
 	// show content:
-	ft::Map<char,int>::reverse_iterator rit;
+	std::map<char,int>::reverse_iterator rit;
 	for (rit=mymap.rbegin(); rit!=mymap.rend(); ++rit)
 		std::cout << rit->first << " => " << rit->second << '\n';
 }
@@ -78,7 +78,7 @@ void		rbegin_test()
 void		empty_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "EMPTY" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
 	mymap['a']=10;
 	mymap['b']=20;
@@ -94,7 +94,7 @@ void		empty_test()
 void		size_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "SIZE" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 	mymap['a']=101;
 	mymap['b']=202;
 	mymap['c']=302;
@@ -106,7 +106,7 @@ void		max_size_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "MAX_SIZE" << std::endl;
 	int i;
-	ft::Map<int,int> mymap;
+	std::map<int,int> mymap;
 
 	if (mymap.max_size()>1000)
 	{
@@ -119,7 +119,7 @@ void		max_size_test()
 void		operator_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "OPERATOR[]" << std::endl;
-	ft::Map<char,std::string> mymap;
+	std::map<char,std::string> mymap;
 
 	mymap['a']="an element";
 	mymap['b']="another element";
@@ -136,26 +136,26 @@ void		operator_test()
 void		insert_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "INSERT" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
 	// first insert function version (single parameter):
-	mymap.insert ( ft::pair<char,int>('a',100) );
-	mymap.insert ( ft::pair<char,int>('z',200) );
+	mymap.insert ( std::pair<char,int>('a',100) );
+	mymap.insert ( std::pair<char,int>('z',200) );
 
-	ft::pair<ft::Map<char,int>::iterator,bool> ret;
-	ret = mymap.insert ( ft::pair<char,int>('z',500) );
+	std::pair<std::map<char,int>::iterator,bool> ret;
+	ret = mymap.insert ( std::pair<char,int>('z',500) );
 	if (ret.second==false) {
 		std::cout << "element 'z' already existed";
 		std::cout << " with a value of " << ret.first->second << '\n';
 	}
 
 	// second insert function version (with hint position):
-	ft::Map<char,int>::iterator it = mymap.begin();
-	mymap.insert (it, ft::pair<char,int>('b',300));  // max efficiency inserting
-	mymap.insert (it, ft::pair<char,int>('c',400));  // no max efficiency inserting
+	std::map<char,int>::iterator it = mymap.begin();
+	mymap.insert (it, std::pair<char,int>('b',300));  // max efficiency inserting
+	mymap.insert (it, std::pair<char,int>('c',400));  // no max efficiency inserting
 
 	// third insert function version (range insertion):
-	ft::Map<char,int> anothermap;
+	std::map<char,int> anothermap;
 	anothermap.insert(mymap.begin(),mymap.find('c'));
 
 	// showing contents:
@@ -169,10 +169,10 @@ void		insert_test()
 }
 
 void		erase_test()
-}
+{
 	std::cout << std::setfill('-') << std::setw(20) << "ERASE" << std::endl;
-	ft::Map<char,int> mymap;
-	ft::Map<char,int>::iterator it;
+	std::map<char,int> mymap;
+	std::map<char,int>::iterator it;
 
 	// insert some values:
 	mymap['a']=10;
@@ -198,7 +198,7 @@ void		erase_test()
 void		swap_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "SWAP" << std::endl;
-	ft::Map<char,int> foo,bar;
+	std::map<char,int> foo,bar;
 
 	foo['x']=100;
 	foo['y']=200;
@@ -210,25 +210,25 @@ void		swap_test()
 	foo.swap(bar);
 
 	std::cout << "foo contains:\n";
-	for (ft::Map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
+	for (std::map<char,int>::iterator it=foo.begin(); it!=foo.end(); ++it)
 		std::cout << it->first << " => " << it->second << '\n';
 
 	std::cout << "bar contains:\n";
-	for (ft::Map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
+	for (std::map<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
 		std::cout << it->first << " => " << it->second << '\n';
 }
 
 void		clear_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "CLEAR" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
 	mymap['x']=100;
 	mymap['y']=200;
 	mymap['z']=300;
 
 	std::cout << "mymap contains:\n";
-	for (ft::Map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+	for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 		std::cout << it->first << " => " << it->second << '\n';
 
 	mymap.clear();
@@ -236,16 +236,16 @@ void		clear_test()
 	mymap['b']=2202;
 
 	std::cout << "mymap contains:\n";
-	for (ft::Map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+	for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 		std::cout << it->first << " => " << it->second << '\n';
 }
 
 void		key_compare_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "KEY_COMP" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
-	ft::Map<char,int>::key_compare mycomp = mymap.key_comp();
+	std::map<char,int>::key_compare mycomp = mymap.key_comp();
 
 	mymap['a']=100;
 	mymap['b']=200;
@@ -255,7 +255,7 @@ void		key_compare_test()
 
 	char highest = mymap.rbegin()->first;     // key value of last element
 
-	ft::Map<char,int>::iterator it = mymap.begin();
+	std::map<char,int>::iterator it = mymap.begin();
 	do {
 		std::cout << it->first << " => " << it->second << '\n';
 	} while ( mycomp((*it++).first, highest) );
@@ -264,7 +264,7 @@ void		key_compare_test()
 void		value_compare_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "VALUE_COMP" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
 	mymap['x']=1001;
 	mymap['y']=2002;
@@ -272,9 +272,9 @@ void		value_compare_test()
 
 	std::cout << "mymap contains:\n";
 
-	ft::pair<char,int> highest = *mymap.rbegin();          // last element
+	std::pair<char,int> highest = *mymap.rbegin();          // last element
 
-	ft::Map<char,int>::iterator it = mymap.begin();
+	std::map<char,int>::iterator it = mymap.begin();
 	do {
 		std::cout << it->first << " => " << it->second << '\n';
 	} while ( mymap.value_comp()(*it++, highest) );
@@ -283,8 +283,8 @@ void		value_compare_test()
 void		find_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "FIND" << std::endl;
-	ft::Map<char,int> mymap;
-	ft::Map<char,int>::iterator it;
+	std::map<char,int> mymap;
+	std::map<char,int>::iterator it;
 
 	mymap['a']=50;
 	mymap['b']=100;
@@ -305,7 +305,7 @@ void		find_test()
 void		count_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "COUNT" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 	char c;
 
 	mymap ['a']=101;
@@ -325,8 +325,8 @@ void		count_test()
 void		bound_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "LOWER_BOUND, UPPER_BOUND" << std::endl;
-	ft::Map<char,int> mymap;
-	ft::Map<char,int>::iterator itlow,itup;
+	std::map<char,int> mymap;
+	std::map<char,int>::iterator itlow,itup;
 
 	mymap['a']=20;
 	mymap['b']=40;
@@ -340,20 +340,20 @@ void		bound_test()
 	mymap.erase(itlow,itup);        // erases [itlow,itup)
 
 	// print content:
-	for (ft::Map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+	for (std::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
 		std::cout << it->first << " => " << it->second << '\n';
 }
 
 void		range_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "EQUAL_RANGE" << std::endl;
-	ft::Map<char,int> mymap;
+	std::map<char,int> mymap;
 
 	mymap['a']=10;
 	mymap['b']=20;
 	mymap['c']=30;
 
-	ft::pair<ft::Map<char,int>::iterator,ft::Map<char,int>::iterator> ret;
+	std::pair<std::map<char,int>::iterator,std::map<char,int>::iterator> ret;
 	ret = mymap.equal_range('b');
 
 	std::cout << "lower bound points to: ";

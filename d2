@@ -22,6 +22,9 @@ size: 3
 size: 0
 
 ------------------------------------
+size: 3
+0 0 0 
+------------------------------------
 Size of first: 0
 Size of second: 3
 ---------------BEGIN
@@ -69,3 +72,62 @@ mylist contains: 1 2 3 4 5 100 100 100 0 0 0 0
 ---------------CLEAR
 mylist contains: 100 200 300
 mylist contains: 1101 2202
+--------------SPLICE
+size: 7
+1 10 20 30 2 3 4 
+------------------------------------
+size: 0
+
+------------------------------------
+size: 6
+1 10 20 30 3 4 
+------------------------------------
+size: 1
+2 
+------------------------------------
+size: 6
+30 3 4 1 10 20 
+------------------------------------
+size: 1
+2 
+------------------------------------
+mylist1 contains: 30 3 4 1 10 20
+mylist2 contains: 2
+--------------REMOVE
+mylist contains: 17 7 14
+-----------REMOVE_IF
+mylist contains: 36 20
+--------------UNIQUE
+size: 10
+12.15 2.72 73 12.77 3.14 12.77 73.35 72.25 15.3 72.25 
+------------------------------------
+size: 10
+2.72 3.14 12.15 12.77 12.77 15.3 72.25 72.25 73 73.35 
+------------------------------------
+size: 8
+2.72 3.14 12.15 12.77 15.3 72.25 73 73.35 
+------------------------------------
+size: 6
+2.72 3.14 12.15 15.3 72.25 73 
+------------------------------------
+size: 3
+2.72 12.15 72.25 
+------------------------------------
+mylist contains: 2.72 12.15 72.25
+---------------MERGE
+first contains: 1.4 2.2 2.9 2.1 3.1 3.7 7.1
+----------------SORT
+mylist contains: Three one two
+mylist contains: one Three two
+-------------REVERSE
+mylist contains: 9 8 7 6 5 4 3 2 1
+----------RELATIONAL
+a and b are equal
+b and c are not equal
+b is less than c
+c is greater than b
+a is less than or equal to b
+a is greater than or equal to b
+--------NON_MEM_SWAP
+foo contains: 200 200 200 200 200
+bar contains: 100 100 100

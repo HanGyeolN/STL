@@ -90,6 +90,7 @@ void		copy_operator_test()
 
 	first = ft::List<int>();
 	show_list(first);
+	show_list(second);
 
 	std::cout << "Size of first: " << int (first.size()) << '\n';
 	std::cout << "Size of second: " << int (second.size()) << '\n';
@@ -648,44 +649,44 @@ void		non_mem_swap_test()
 
 int main(void)
 {
-	// construct_test();
-	// copy_operator_test();
-	// begin_test();
-	// end_test();
-	// rbegin_test();
+	construct_test();
+	copy_operator_test();
+	begin_test();
+	end_test();
+	rbegin_test();
 
-	// rend_test();
+	rend_test();
 
-	// empyt_test();
-	// size_test();
+	empyt_test();
+	size_test();
 
-	// max_size_test();
-	// front_test();
+	max_size_test();
+	front_test();
 
-	// back_test();
+	back_test();
 
-	// assign_test();
-	// push_front_test();
+	assign_test();
+	push_front_test();
 
-	// pop_front_test();
-	// push_back_test();
+	pop_front_test();
+	push_back_test();
 
-	// pop_back_test();
+	pop_back_test();
 
-	// insert_test();
+	insert_test();
 
-	// erase_test();
-	// swap_test();
+	erase_test();
+	swap_test();
 
-	// resize_test();
+	resize_test();
 
-	// clear_test();
+	clear_test();
 
-	// splice_test();
+	splice_test();
 
-	// remove_test();
+	remove_test();
 
-	// remove_if_test();
+	remove_if_test();
 
 	unique_test();
 

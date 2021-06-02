@@ -39,7 +39,7 @@ bool compare_nocase (const std::string& first, const std::string& second)
 template <typename T>
 void	show_list(std::list<T> &l)
 {
-	typename std::list<T>::iterator	iter;
+	typename std::list<T>::iterator			iter;
 	std::cout << "size: " << l.size() << "\n";
 	
 	// std::cout << l._begin;
@@ -89,6 +89,7 @@ void		copy_operator_test()
 
 	first = std::list<int>();
 	show_list(first);
+	show_list(second);
 
 	std::cout << "Size of first: " << int (first.size()) << '\n';
 	std::cout << "Size of second: " << int (second.size()) << '\n';
@@ -435,27 +436,32 @@ void		splice_test()
 
 	it = mylist1.begin();
 	++it;                         // points to 2
-	show_list(mylist1);
-	show_list(mylist2);
 	
 	
 
 	mylist1.splice (it, mylist2); // mylist1: 1 10 20 30 2 3 4
 	show_list(mylist1);
+	show_list(mylist2);
+	// show_list(mylist1);
 	// mylist2 (empty)
 	// "it" still points to 2 (the 5th element)
 
-	std::cout << "check\n";
 	mylist2.splice (mylist2.begin(),mylist1, it);
-	std::cout << "check\n";
+	show_list(mylist1);
+	show_list(mylist2);
 	// mylist1: 1 10 20 30 3 4
 	// mylist2: 2
 	// "it" is now invalid.
 	it = mylist1.begin();
+	// std::cout << "check: " << it._element << '\n';
 	// std::advance(it,3);           // "it" points now to 30
+	++it;
+	++it;
+	++it;
 
 	mylist1.splice ( mylist1.begin(), mylist1, it, mylist1.end());
-	std::cout << "check\n";
+	show_list(mylist1);
+	show_list(mylist2);
 	// mylist1: 30 3 4 1 10 20
 
 	std::cout << "mylist1 contains:";
@@ -505,17 +511,22 @@ void		unique_test()
 	double mydoubles[]={ 12.15,  2.72, 73.0,  12.77,  3.14,
 							12.77, 73.35, 72.25, 15.3,  72.25 };
 	std::list<double> mylist (mydoubles,mydoubles+10);
+	show_list(mylist);
 
 	mylist.sort();             //  2.72,  3.14, 12.15, 12.77, 12.77,
 	// 15.3,  72.25, 72.25, 73.0,  73.35
+	show_list(mylist);
 
 	mylist.unique();           //  2.72,  3.14, 12.15, 12.77
 	// 15.3,  72.25, 73.0,  73.35
+	show_list(mylist);
 
 	mylist.unique (same_integral_part);  //  2.72,  3.14, 12.15
 	// 15.3,  72.25, 73.0
+	show_list(mylist);
 
 	mylist.unique (is_near());           //  2.72, 12.15, 72.25
+	show_list(mylist);
 
 	std::cout << "mylist contains:";
 	for (std::list<double>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
@@ -670,23 +681,23 @@ int main(void)
 
 	clear_test();
 
-	// splice_test();
+	splice_test();
 
-	// remove_test();
+	remove_test();
 
-	// remove_if_test();
+	remove_if_test();
 
-	// unique_test();
+	unique_test();
 
-	// merge_test();
+	merge_test();
 
-	// sort_test();
+	sort_test();
 
-	// reverse_test();
+	reverse_test();
 
-	// relational_test();
+	relational_test();
 
-	// non_mem_swap_test();
+	non_mem_swap_test();
 
 	return (0);
 }
