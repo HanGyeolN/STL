@@ -5,74 +5,40 @@
 # include "MapNode.hpp"
 # include "MapIterator.hpp"
 # include "ReverseMapIterator.hpp"
+# include "utils.hpp"
 
 namespace ft
 {
-	// Map
-	// Maps are associative containers that store elements formed by a combination of a key value and a mapped value, following a specific order.
 
-	// In a map, the key values are generally used to sort and uniquely identify the elements, while the mapped values store the content associated to this key. The types of key and mapped value may differ, and are grouped together in member type value_type, which is a pair type combining both:
-
-	// typedef pair<const Key, T> value_type;
-
-		
-
-
-	// Internally, the elements in a map are always sorted by its key following a specific strict weak ordering criterion indicated by its internal comparison object (of type Compare).
-
-	// map containers are generally slower than unordered_map containers to access individual elements by their key, but they allow the direct iteration on subsets based on their order.
-
-	// The mapped values in a map can be accessed directly by their corresponding key using the bracket operator ((operator[]).
-
-	// Maps are typically implemented as binary search trees.
-
-	// Container properties
-
-	// Associative
-	// 	Elements in associative containers are referenced by their key and not by their absolute position in the container.
-	// Ordered
-	// 	The elements in the container follow a strict order at all times. All inserted elements are given a position in this order.
-	// Map
-	// 	Each element associates a key to a mapped value: Keys are meant to identify the elements whose main content is the mapped value.
-	// Unique keys
-	// 	No two elements in the container can have equivalent keys.
-	// Allocator-aware
-	// 	The container uses an allocator object to dynamically handle its storage needs.
-
-
-	// Template parameters
-
-	// Key
-	// 	Type of the keys. Each element in a map is uniquely identified by its key value.
-	// 	Aliased as member type map::key_type.
-	// T
-	// 	Type of the mapped value. Each element in a map stores some data as its mapped value.
-	// 	Aliased as member type map::mapped_type.
-	// Compare
-	// 	A binary predicate that takes two element keys as arguments and returns a bool. The expression comp(a,b), where comp is an object of this type and a and b are key values, shall return true if a is considered to go before b in the strict weak ordering the function defines.
-	// 	The map object uses this expression to determine both the order the elements follow in the container and whether two element keys are equivalent (by comparing them reflexively: they are equivalent if !comp(a,b) && !comp(b,a)). No two elements in a map container can have equivalent keys.
-	// 	This can be a function pointer or a function object (see constructor for an example). This defaults to less<T>, which returns the same as applying the less-than operator (a<b).
-	// 	Aliased as member type map::key_compare.
-	// Alloc
-	// 	Type of the allocator object used to define the storage allocation model. By default, the allocator class template is used, which defines the simplest memory allocation model and is value-independent.
-	// 	Aliased as member type map::allocator_type.
-
-
-	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<std::pair<const Key, T> > >
+	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::Pair<const Key, T> > >
 	class Map
 	{
 
 	public:
 		typedef Key											key_type;
 		typedef T											mapped_type;
-		typedef	std::pair<const key_type, mapped_type>		value_type;
+		typedef	ft::Pair<const key_type, mapped_type>		value_type;
 		typedef Compare										key_compare;
-		// typedef ???										value_compare;
+
+		class value_compare : std::binary_function<value_type, value_type, bool>
+		{
+			friend class Map<key_type, mapped_type, key_compare, Alloc>;
+			
+			protected:
+				Compare comp;
+				value_compare (Compare c) : comp(c) {}
+			
+			public:
+
+				bool operator() (const value_type& x, const value_type& y) const
+				{ return (comp(x.first, y.first)); }
+		};
+
 		typedef Alloc										allocator_type;
-		typedef allocator_type::reference					reference;
-		typedef allocator_type::const_reference				const_reference;
-		typedef allocator_type::pointer						pointer;
-		typedef allocator_type::const_pointer				const_pointer;
+		typedef typename allocator_type::reference			reference;
+		typedef typename allocator_type::const_reference	const_reference;
+		typedef typename allocator_type::pointer			pointer;
+		typedef typename allocator_type::const_pointer		const_pointer;
 		typedef MapIterator<value_type>						iterator;
 		typedef const MapIterator<value_type>				const_iterator;
 		typedef ReverseMapIterator<value_type>				reverse_iterator;
@@ -81,11 +47,14 @@ namespace ft
 		typedef size_t										size_type;
 
 	private:
-		allocator_type		_allocator;
-		pointer				_root;
-		pointer				_begin;
-		pointer				_end;
-		size_type			_size;
+		typedef typename allocator_type::template
+				rebind< MapNode<value_type> >::other	node_allocator;
+		typedef typename node_allocator::pointer	_node_pointer;
+
+		allocator_type			_allocator;
+		node_allocator			_node_allocator;
+		key_compare				_key_comp;
+		MapNode<value_type>*	_root;
 
 	public:
 
@@ -129,60 +98,29 @@ namespace ft
 //     These objects are automatically constructed from initializer list declarators.
 //     Member type value_type is the type of the elements in the container, defined in map as an alias of pair<const key_type, mapped_type> (see map types).
 
-		explicit Map(const key_compare &comp = key_compare(), const allocator_type& alloc = allocator_type()) : _allocator(alloc)
+		explicit Map(const key_compare &comp = key_compare(), const allocator_type& alloc = allocator_type()) 
+			: _allocator(alloc), _key_comp(comp), _root(0)
 		{
+			
 		}
 
 		template <class InputIterator>
 		Map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+			: _allocator(alloc), _key_comp(comp), _root(0)
 		{
-
+			while (first != last)
+			{
+				insert(*first);
+				++first;
+			}
 		}
 
 		Map (const Map& x);
 
-// This destroys all container elements, and deallocates all the storage capacity allocated by the map container using its allocator.
 		~Map();
 
-// Copy container content
-// Assigns new contents to the container, replacing its current content.
 
-// Copies all the elements from x into the container, changing its size accordingly.
-
-// The container preserves its current allocator, which is used to allocate additional storage if needed.
-
-// The elements stored in the container before the call are either assigned to or destroyed.
-
-// Parameters
-
-// x
-//     A map object of the same type (i.e., with the same template parameters, key, T, Compare and Alloc).
-// il
-//     An initializer_list object. The compiler will automatically construct such objects from initializer list declarators.
-//     Member type value_type is the type of the elements in the container, defined in map as an alias of pair<const key_type, mapped_type> (see map member types).
-
-
-// Return value
-// *this 
 		Map& operator=(const Map& x);
-
-// Return iterator to beginning
-// Returns an iterator referring to the first element in the map container.
-
-// Because map containers keep their elements ordered at all times, begin points to the element that goes first following the container's sorting criterion.
-
-// If the container is empty, the returned iterator value shall not be dereferenced.
-
-// Parameters
-// none
-
-// Return Value
-// An iterator to the first element in the container.
-
-// If the map object is const-qualified, the function returns a const_iterator. Otherwise, it returns an iterator.
-
-// Member types iterator and const_iterator are bidirectional iterator types pointing to elements (of type value_type).
-// Notice that value_type in map containers is an alias of pair<const key_type, mapped_type>.
 
 		iterator begin()
 		{
@@ -207,26 +145,6 @@ namespace ft
 			}
 			return (begin);
 		}
-
-
-// Return iterator to end
-// Returns an iterator referring to the past-the-end element in the map container.
-
-// The past-the-end element is the theoretical element that would follow the last element in the map container. It does not point to any element, and thus shall not be dereferenced.
-
-// Because the ranges used by functions of the standard library do not include the element pointed by their closing iterator, this function is often used in combination with map::begin to specify a range including all the elements in the container.
-
-// If the container is empty, this function returns the same as map::begin.
-
-// Parameters
-// none
-
-// Return Value
-// An iterator to the past-the-end element in the container.
-
-// If the map object is const-qualified, the function returns a const_iterator. Otherwise, it returns an iterator.
-
-// Member types iterator and const_iterator are bidirectional iterator types pointing to elements.
 
 		iterator end()
 		{
@@ -274,7 +192,7 @@ namespace ft
 
 		bool		empty() const
 		{
-			if (_size == 0)
+			if (size() == 0)
 				return (true);
 			else
 				return (false);
@@ -282,12 +200,22 @@ namespace ft
 
 		size_type	size() const
 		{
-			return (_size);
+			iterator		iter;
+			size_type		i;
+
+			i = 0;
+			iter = begin();
+			while (iter != end())
+			{
+				++iter;
+				++i;
+			}
+			return (i);
 		}
 
 		size_type	max_size() const
 		{
-			return (_allocator.max_size());
+			return (_node_allocator.max_size());
 		}
 
 // Access element
@@ -381,14 +309,13 @@ namespace ft
 // pair is a class template declared in <utility> (see pair).
 
 
-		std::pair<iterator, bool> insert(const value_type& val)
+		ft::Pair<iterator, bool>	insert(const value_type& val)
 		{
-			if (_size == 0)
+			if (_root == 0)
 			{
-				++_size;
-				_root = _allocator.allocate(1);
-				_allocator.construct(_root, MapNode<T>(val));
-				return (std::pair<iterator, bool>(_root, true));
+				_root = _node_allocator.allocate(1);
+				_node_allocator.construct(_root, MapNode<value_type>(val));
+				return (ft::Pair<iterator, bool>(_root, true));
 			}
 			else
 			{
@@ -437,12 +364,6 @@ namespace ft
 
 // Member type size_type is an unsigned integral type.
 
-		void		delete(const pointer &p)
-		{
-			_allocator.destroy(p);
-			_allocator.deallocate(p);
-		}
-
 		void		erase(iterator position)
 		{
 			if (position->_left && position->_right) // 자식 노드가 두개 있는 경우
@@ -490,8 +411,8 @@ namespace ft
 						position->_right->_parent = position->_parent;
 					}
 				}
-				delete(position._element);
-				--size;
+				_node_allocator.destroy(position._element);
+				_node_allocator.deallocate(position._element, 1);
 			}
 			else // 자식 노드가 없는경우
 			{
@@ -504,8 +425,8 @@ namespace ft
 				}
 				else
 					_root = 0;
-				delete(position._element);
-				--size;
+				_node_allocator.destroy(position._element);
+				_node_allocator.deallocate(position._element, 1);
 			}
 		}
 
@@ -532,39 +453,12 @@ namespace ft
 			}
 		}
 
-// Swap content
-// Exchanges the content of the container by the content of x, which is another map of the same type. Sizes may differ.
-
-// After the call to this member function, the elements in this container are those which were in x before the call, 
-// and the elements of x are those which were in this. All iterators, references and pointers remain valid for the swapped objects.
-
-// Notice that a non-member function exists with the same name, swap, overloading that algorithm with an optimization that behaves like this member function.
-
-// Whether the internal container allocators and comparison objects are swapped is undefined.
-
-// Parameters
-// x
-// Another map container of the same type as this 
-// (i.e., with the same template parameters, Key, T, Compare and Alloc) whose content is swapped with that of this container.
-
-// Return value
-// none
-
-		void swap (map& x)
+		void	swap(Map& x)
 		{
 			swap(this->_allocator, x._allocator);
-			swap(this->_size, x._size);
+			swap(this->_node_allocator, x._node_allocator);
 			swap(this->_root, x._root);
 		}
-
-// Clear content
-// Removes all elements from the map container (which are destroyed), leaving the container with a size of 0.
-
-// Parameters
-// none
-
-// Return value
-// none
 
 		void clear()
 		{
@@ -575,8 +469,8 @@ namespace ft
 			while (begin != end())
 			{
 				temp = ++begin;
-				_allocator.destroy(begin->_element);
-				_allocator.deallocate(begin->_element);
+				_node_allocator.destroy(begin->_element);
+				_node_allocator.deallocate(begin->_element);
 				begin = temp;
 			}
 		}
@@ -783,14 +677,14 @@ namespace ft
 // Member types iterator and const_iterator are bidirectional iterator types pointing to elements (of type value_type).
 // Notice that value_type in map containers is itself also a pair type: pair<const key_type, mapped_type>.
 
-		std::pair<const_iterator,const_iterator> equal_range (const key_type& k) const
+		ft::Pair<const_iterator,const_iterator> equal_range (const key_type& k) const
 		{
-			return (std::pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k)));
+			return (ft::Pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k)));
 		}
 
-		std::pair<iterator,iterator>             equal_range (const key_type& k)
+		ft::Pair<iterator,iterator>             equal_range (const key_type& k)
 		{
-			return (std::pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
+			return (ft::Pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
 		}
 
 // Get allocator
@@ -821,17 +715,16 @@ namespace ft
 			b = temp;
 		}
 
-		std::pair<iterator, bool>	insert_value(pointer node, const value_type& val)
+		ft::Pair<iterator, bool>	insert_value(pointer node, const value_type& val)
 		{
 			if (val.first < (node->_data).first)
 			{
 				if (node->_left == 0)
 				{
-					++_size;
-					node->_left = _allocator.allocate(1);
-					_allocator.construct(node->_left, MapNode<T>(val));
-					node->_left->_parent = _node->_left;
-					return (std::pair<iterator, bool>(node, true));
+					node->_left = _node_allocator.allocate(1);
+					_node_allocator.construct(node->_left, MapNode<value_type>(val));
+					node->_left->_parent = node->_left;
+					return (ft::Pair<iterator, bool>(node, true));
 				}
 				else
 				{
@@ -842,11 +735,10 @@ namespace ft
 			{
 				if (node->_right == 0)
 				{
-					++_size;
-					node->_right = _allocator.allocate(1);
-					_allocator.construct(node->_right, MapNode<T>(val));
-					node->_right->_parent = _node->_right;
-					return (std::pair<iterator, bool>(node, true));
+					node->_right = _node_allocator.allocate(1);
+					_node_allocator.construct(node->_right, MapNode<value_type>(val));
+					node->_right->_parent = node->_right;
+					return (ft::Pair<iterator, bool>(node, true));
 				}
 				else
 				{
@@ -855,7 +747,7 @@ namespace ft
 			}
 			else
 			{
-				return (std::pair<iterator, bool>(node, false));
+				return (ft::Pair<iterator, bool>(node, false));
 			}
 		}
 	};

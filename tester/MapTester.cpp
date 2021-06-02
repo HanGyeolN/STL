@@ -139,11 +139,11 @@ void		insert_test()
 	ft::Map<char,int> mymap;
 
 	// first insert function version (single parameter):
-	mymap.insert ( ft::pair<char,int>('a',100) );
-	mymap.insert ( ft::pair<char,int>('z',200) );
+	mymap.insert ( ft::Pair<char,int>('a',100) );
+	mymap.insert ( ft::Pair<char,int>('z',200) );
 
-	ft::pair<ft::Map<char,int>::iterator,bool> ret;
-	ret = mymap.insert ( ft::pair<char,int>('z',500) );
+	ft::Pair<ft::Map<char,int>::iterator,bool> ret;
+	ret = mymap.insert ( ft::Pair<char,int>('z',500) );
 	if (ret.second==false) {
 		std::cout << "element 'z' already existed";
 		std::cout << " with a value of " << ret.first->second << '\n';
@@ -151,8 +151,8 @@ void		insert_test()
 
 	// second insert function version (with hint position):
 	ft::Map<char,int>::iterator it = mymap.begin();
-	mymap.insert (it, ft::pair<char,int>('b',300));  // max efficiency inserting
-	mymap.insert (it, ft::pair<char,int>('c',400));  // no max efficiency inserting
+	mymap.insert (it, ft::Pair<char,int>('b',300));  // max efficiency inserting
+	mymap.insert (it, ft::Pair<char,int>('c',400));  // no max efficiency inserting
 
 	// third insert function version (range insertion):
 	ft::Map<char,int> anothermap;
@@ -169,7 +169,7 @@ void		insert_test()
 }
 
 void		erase_test()
-}
+{
 	std::cout << std::setfill('-') << std::setw(20) << "ERASE" << std::endl;
 	ft::Map<char,int> mymap;
 	ft::Map<char,int>::iterator it;
@@ -272,7 +272,7 @@ void		value_compare_test()
 
 	std::cout << "mymap contains:\n";
 
-	ft::pair<char,int> highest = *mymap.rbegin();          // last element
+	ft::Pair<char,int> highest = *mymap.rbegin();          // last element
 
 	ft::Map<char,int>::iterator it = mymap.begin();
 	do {
@@ -353,7 +353,7 @@ void		range_test()
 	mymap['b']=20;
 	mymap['c']=30;
 
-	ft::pair<ft::Map<char,int>::iterator,ft::Map<char,int>::iterator> ret;
+	ft::Pair<ft::Map<char,int>::iterator,ft::Map<char,int>::iterator> ret;
 	ret = mymap.equal_range('b');
 
 	std::cout << "lower bound points to: ";
