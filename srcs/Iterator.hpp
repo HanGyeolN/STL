@@ -36,7 +36,7 @@ template <typename Category, typename T, typename Distance = ptrdiff_t, typename
 class BaseIterator : public Iterator<Category, T, Distance>
 {
 public:
-	pointer		_element;
+	Pointer		_element;
 
 public:
 	BaseIterator();

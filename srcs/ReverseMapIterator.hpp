@@ -1,17 +1,21 @@
 #ifndef REVERSE_MAP_ITERATOR_HPP
 # define REVERSE_MAP_ITERATOR_HPP
 
-# include "ReverseMapIterator.hpp"
+# include "Iterator.hpp"
+# include "MapNode.hpp"
 
 template <typename T>
-class ReverseMapIterator : public MapIterator<T>
+class ReverseMapIterator
 {
+public:
+	MapNode<T>			*_element;
+
 public:
 	typedef typename Iterator<bidirectional_iterator_tag, T>::iterator_category	iterator_category;
 	typedef typename Iterator<bidirectional_iterator_tag, T>::value_type		value_type;
 	typedef typename Iterator<bidirectional_iterator_tag, T>::difference_type	difference_type;
-	typedef MapNode<T>*															pointer;
-	typedef MapNode<T>&															reference;
+	typedef typename Iterator<bidirectional_iterator_tag, T>::pointer			pointer;
+	typedef typename Iterator<bidirectional_iterator_tag, T>::reference			reference;
 
 public:
 	
@@ -19,7 +23,7 @@ public:
 	{
 	};
 
-	ReverseMapIterator(const pointer element)
+	ReverseMapIterator(MapNode<T> *element)
 	{
 		this->_element = element;
 	}
@@ -32,6 +36,7 @@ public:
 	ReverseMapIterator&		operator=(const ReverseMapIterator &ref)
 	{
 		this->_element = ref._element;
+		return (*this);
 	}
 
 	~ReverseMapIterator()
@@ -49,12 +54,12 @@ public:
 
 	reference			operator*()
 	{
-		return (*(this->_element));
+		return (this->_element->_data);
 	}
 
-	T					*operator->()
+	pointer				operator->()
 	{
-		return (this->_element->_data);
+		return (&(this->_element->_data));
 	}
 
 	ReverseMapIterator<T>		&operator++()

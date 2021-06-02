@@ -5,8 +5,10 @@
 # include "MapNode.hpp"
 
 template <typename T>
-class MapIterator : public BaseIterator<bidirectional_iterator_tag, T>
+class MapIterator
 {
+public:
+	MapNode<T>		*_element;
 
 public:
 	typedef typename Iterator<bidirectional_iterator_tag, T>::iterator_category	iterator_category;
@@ -19,7 +21,7 @@ public:
 	{
 	};
 
-	MapIterator(const pointer element)
+	MapIterator(MapNode<T>	*element)
 	{
 		this->_element = element;
 	}
@@ -32,6 +34,7 @@ public:
 	MapIterator&		operator=(const MapIterator &ref)
 	{
 		this->_element = ref._element;
+		return (*this);
 	}
 
 	~MapIterator()
@@ -49,12 +52,12 @@ public:
 
 	reference			operator*()
 	{
-		return (*(this->_element));
+		return (this->_element->_data);
 	}
 
 	pointer				operator->()
 	{
-		return ((this->_element->_data));
+		return (&(this->_element->_data));
 	}
 
 	MapIterator<T>		&operator++()

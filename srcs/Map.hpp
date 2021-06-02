@@ -48,8 +48,8 @@ namespace ft
 
 	private:
 		typedef typename allocator_type::template
-				rebind< MapNode<value_type> >::other	node_allocator;
-		typedef typename node_allocator::pointer	_node_pointer;
+				rebind< MapNode<value_type> >::other		node_allocator;
+		typedef typename node_allocator::pointer			node_pointer;
 
 		allocator_type			_allocator;
 		node_allocator			_node_allocator;
@@ -124,7 +124,7 @@ namespace ft
 
 		iterator begin()
 		{
-			pointer		begin;
+			node_pointer		begin;
 
 			begin = _root;
 			while (begin->_left)
@@ -136,7 +136,7 @@ namespace ft
 
 		const_iterator begin() const
 		{
-			pointer		begin;
+			node_pointer		begin;
 
 			begin = _root;
 			while (begin->_left)
@@ -158,7 +158,7 @@ namespace ft
 
 		reverse_iterator rbegin()
 		{
-			pointer		end;
+			node_pointer		end;
 
 			end = _root;
 			while (end->_right)
@@ -170,7 +170,7 @@ namespace ft
 
 		const_reverse_iterator rbegin() const
 		{
-			pointer		end;
+			node_pointer		end;
 
 			end = _root;
 			while (end->_right)
@@ -239,7 +239,8 @@ namespace ft
 // Return value
 // A reference to the mapped value of the element with a key value equivalent to k.
 
-// Member type mapped_type is the type of the mapped values in the container, defined in map as an alias of its second template parameter (T).
+// Member type mapped_type is the type of the mapped values in the container, 
+// defined in map as an alias of its second template parameter (T).
 
 		mapped_type&	operator[](const key_type& k)
 		{
@@ -250,7 +251,7 @@ namespace ft
 				return (target->second);
 			else
 			{
-				return ((insert(value_type(k, 0))->_data).second);
+				return ((insert(value_type(k, 0)).first)->second);
 			}
 		}
 
