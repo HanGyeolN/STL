@@ -191,7 +191,7 @@ namespace ft
 
 		void				insert_private(iterator position, int n, int val)
 		{
-			for (size_type i = 0; i < n; ++i)
+			for (int i = 0; i < n; ++i)
 			{
 				position = insert(position, val);
 			}
@@ -222,7 +222,7 @@ namespace ft
 		void				assign_private(int n, int val)
 		{
 			clear();
-			for (size_type i = 0; i < n; ++i)
+			for (int i = 0; i < n; ++i)
 			{
 				push_back(val);
 			}
@@ -234,14 +234,14 @@ namespace ft
 
 // 기본생성자, allocator로 기본 용량만큼 할당받고 끝
 template <typename T, typename Alloc>
-ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _capacity(0), _size(0), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(const allocator_type& alloc) : _allocator(alloc), _capacity(0), _size(0)
 {
 	_begin = _allocator.allocate(_capacity);
 }
 
 // n만큼 공간을 할당받고 val로 할당받은 공간에 construct 한다.
 template <typename T, typename Alloc>
-ft::Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _capacity(n), _size(0), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator_type& alloc) : _allocator(alloc), _capacity(n), _size(0)
 {
 	size_type		i;
 
@@ -259,14 +259,14 @@ ft::Vector<T, Alloc>::Vector(size_type n, const value_type& val, const allocator
 // 레퍼런스 참고
 template <typename T, typename Alloc>
 	template <typename InputIterator>
-ft::Vector<T, Alloc>::Vector(InputIterator first, InputIterator last, const allocator_type& alloc) : _capacity(1), _size(0), _allocator(alloc)
+ft::Vector<T, Alloc>::Vector(InputIterator first, InputIterator last, const allocator_type& alloc) : _allocator(alloc), _capacity(0), _size(0)
 {
 	private_vector(first, last);
 }
 
 // 복사생성자
 template <typename T, typename Alloc>
-ft::Vector<T, Alloc>::Vector(const Vector &copy) : _capacity(copy._capacity), _size(0), _allocator(copy._allocator)
+ft::Vector<T, Alloc>::Vector(const Vector &copy) : _allocator(copy._allocator), _capacity(copy._capacity), _size(0)
 {
 	size_type		i;
 
@@ -336,8 +336,6 @@ typename ft::Vector<T, Alloc>::size_type		ft::Vector<T, Alloc>::max_size() const
 template <typename T, typename Alloc>
 void		ft::Vector<T, Alloc>::resize(size_type n, value_type val)
 {
-	size_type		i;
-
 	if (_size > n)
 	{
 		while (_size > n)
