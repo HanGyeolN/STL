@@ -1,6 +1,8 @@
 #ifndef MAP_HPP
 # define MAP_HPP
 
+#include <iostream>
+
 # include <memory>
 # include "MapNode.hpp"
 # include "MapIterator.hpp"
@@ -9,15 +11,24 @@
 
 namespace ft
 {
+	template <typename U>
+	void	swap(U& a, U& b)
+	{
+		U		temp;
 
-	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::Pair<const Key, T> > >
+		temp = a;
+		a = b;
+		b = temp;
+	}
+
+	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::Pair<Key, T> > >
 	class Map
 	{
 
 	public:
 		typedef Key											key_type;
 		typedef T											mapped_type;
-		typedef	ft::Pair<const key_type, mapped_type>		value_type;
+		typedef	ft::Pair<key_type, mapped_type>		value_type;
 		typedef Compare										key_compare;
 
 		class value_compare : std::binary_function<value_type, value_type, bool>
@@ -115,21 +126,31 @@ namespace ft
 			}
 		}
 
-		Map (const Map& x);
+		Map (const Map& copy) : _allocator(copy._allocator), _key_comp(copy._key_comp), _root(0)
+		{
+			this->insert(copy.begin(), copy.end());
+		}
 
-		~Map();
+		~Map()
+		{
+			clear();
+		}
 
 
-		Map& operator=(const Map& x);
+		Map& operator=(const Map& x)
+		{
+			this->clear();
+			this->insert(x.begin(), x.end());
+			return (*this);
+		}
 
 		iterator begin()
 		{
-			node_pointer		begin;
+			iterator			begin(_root);
 
-			begin = _root;
-			while (begin->_left)
+			while (begin._element->_left)
 			{
-				begin = begin->_left;
+				begin._element = begin._element->_left;
 			}
 			return (begin);
 		}
@@ -246,13 +267,16 @@ namespace ft
 		{
 			iterator	target;
 
-			target = find(k);
-			if (target._element)
-				return (target->second);
-			else
+			if (_root)
 			{
-				return ((insert(value_type(k, 0)).first)->second);
+				target = find(k);
+				if (target._element)
+					return (target->second);
+				else
+					return ((insert(value_type(k, 0)).first)->second);
 			}
+			else
+				return ((insert(value_type(k, 0)).first)->second);
 		}
 
 // Insert elements
@@ -302,7 +326,8 @@ namespace ft
 
 
 // Return value
-// The single element versions (1) return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map. The pair::second element in the pair is set to true if a new element was inserted or false if an equivalent key already existed.
+// The single element versions (1) return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map. 
+// The pair::second element in the pair is set to true if a new element was inserted or false if an equivalent key already existed.
 
 // The versions with a hint (2) return an iterator pointing to either the newly inserted element or to the element that already had an equivalent key in the map.
 
@@ -326,7 +351,7 @@ namespace ft
 
 		iterator insert(iterator position, const value_type &val)
 		{
-			return (insert_value(position._element, val));
+			return (insert_value(position._element, val).first);
 		}
 
 		template <class InputIterator>
@@ -367,49 +392,49 @@ namespace ft
 
 		void		erase(iterator position)
 		{
-			if (position->_left && position->_right) // 자식 노드가 두개 있는 경우
+			if (position._element->_left && position._element->_right) // 자식 노드가 두개 있는 경우
 			{
-				iterator		successor(position->_right);
+				iterator		successor(position._element->_right);
 
-				while (successor->_left)
+				while (successor._element->_left)
 				{
-					successor = successor->_left;
+					successor = successor._element->_left;
 				}
-				position->_data = successor->_data;
+				position._element->_data = successor._element->_data;
 				erase(successor);
 			}
-			else if (position->_left || position->_right) // 자식 노드가 하나 있는 경우
+			else if (position._element->_left || position._element->_right) // 자식 노드가 하나 있는 경우
 			{
-				if (position->_left)
+				if (position._element->_left)
 				{
-					if (position->_parent)
+					if (position._element->_parent)
 					{
-						if (position->_parent->_left == position._element)
-							position->_parent->_left = position->_left;
+						if (position._element->_parent->_left == position._element)
+							position._element->_parent->_left = position._element->_left;
 						else
-							position->_parent->_right = position->_left;
-						position->_left->_parent = position->_parent;
+							position._element->_parent->_right = position._element->_left;
+						position._element->_left->_parent = position._element->_parent;
 					}
 					else
 					{
-						_root = position->_left;
-						position->_left->_parent = position->_parent;
+						_root = position._element->_left;
+						position._element->_left->_parent = position._element->_parent;
 					}
 				}
 				else
 				{
-					if (position->_parent)
+					if (position._element->_parent)
 					{
-						if (position->_parent->_left == position._element)
-							position->_parent->_left = position->_right;
+						if (position._element->_parent->_left == position._element)
+							position._element->_parent->_left = position._element->_right;
 						else
-							position->_parent->_right = position->_right;
-						position->_right->_parent = position->_parent;
+							position._element->_parent->_right = position._element->_right;
+						position._element->_right->_parent = position._element->_parent;
 					}
 					else
 					{
-						_root = position->_right;
-						position->_right->_parent = position->_parent;
+						_root = position._element->_right;
+						position._element->_right->_parent = position._element->_parent;
 					}
 				}
 				_node_allocator.destroy(position._element);
@@ -417,12 +442,12 @@ namespace ft
 			}
 			else // 자식 노드가 없는경우
 			{
-				if (position->_parent)
+				if (position._element->_parent)
 				{
-					if (position->_parent->_left == position._element)
-						position->_parent->_left = 0;
+					if (position._element->_parent->_left == position._element)
+						position._element->_parent->_left = 0;
 					else
-						position->_parent->_right = 0;
+						position._element->_parent->_right = 0;
 				}
 				else
 					_root = 0;
@@ -449,31 +474,20 @@ namespace ft
 		{
 			while (first != last)
 			{
-				erase(first);
-				++first;
+				erase(first++);
 			}
 		}
 
 		void	swap(Map& x)
 		{
-			swap(this->_allocator, x._allocator);
-			swap(this->_node_allocator, x._node_allocator);
-			swap(this->_root, x._root);
+			ft::swap(_allocator, x._allocator);
+			ft::swap(this->_root, x._root);
+			ft::swap(this->_key_comp, x._key_comp);
 		}
 
 		void clear()
 		{
-			iterator	begin;
-			iterator	temp;
-
-			begin = begin();
-			while (begin != end())
-			{
-				temp = ++begin;
-				_node_allocator.destroy(begin->_element);
-				_node_allocator.deallocate(begin->_element);
-				begin = temp;
-			}
+			this->erase(this->begin(), this->end());
 		}
 
 // Return key comparison object
@@ -493,7 +507,10 @@ namespace ft
 // Member type key_compare is the type of the comparison object associated to the container, defined in map as an alias of its third template parameter (Compare).
 
 
-		key_compare key_comp() const;
+		key_compare key_comp() const
+		{
+			return (key_compare());
+		}
 
 // Return value comparison object
 // Returns a comparison object that can be used to compare two elements to get whether the key of the first one goes before the second.
@@ -512,7 +529,10 @@ namespace ft
 // The comparison object for element values.
 // Member type value_compare is a nested class type (described above).
 
-		value_compare value_comp() const;
+		value_compare value_comp() const
+		{
+			return (value_compare(key_compare()));
+		}
 
 // Get iterator to element
 // Searches the container for an element with a key equivalent to k and returns an iterator to it if found, otherwise it returns an iterator to map::end.
@@ -533,26 +553,23 @@ namespace ft
 
 // Member types iterator and const_iterator are bidirectional iterator types pointing to elements (of type value_type).
 // Notice that value_type in map containers is an alias of pair<const key_type, mapped_type>.
-		pointer		find_key(const pointer &node, const key_type &k)
+		MapNode<value_type>*		find_key(MapNode<value_type> *node, const key_type &k) const
 		{
-			if (k < node->first)
+			if (k < (node->_data).first)
 			{
 				if (node->_left)
-					find_key(node->_left, k);
+					return (find_key(node->_left, k));
 				else
 					return (0);
 			}
-			else if (k > node->first)
+			else if (k > (node->_data).first)
 			{
 				if (node->_right)
-					find_key(node->_right, k);
+					return (find_key(node->_right, k));
 				else
 					return (0);
 			}
-			else
-			{
-				return (node);
-			}
+			return (node);
 		}
 
 		iterator find (const key_type& k)
@@ -648,12 +665,12 @@ namespace ft
 
 		iterator upper_bound (const key_type& k)
 		{
-			return (++find(_root, k));
+			return (++find(k));
 		}
 
 		const_iterator upper_bound (const key_type& k) const
 		{
-			return (++find(_root, k));
+			return (++find(k));
 		}
 
 // Get range of equal elements
@@ -705,18 +722,8 @@ namespace ft
 		}
 
 	private:
-		
-		template <typename U>
-		void	swap(const U& a, const U& b)
-		{
-			U		temp;
 
-			temp = a;
-			a = b;
-			b = temp;
-		}
-
-		ft::Pair<iterator, bool>	insert_value(pointer node, const value_type& val)
+		ft::Pair<iterator, bool>	insert_value(MapNode<value_type> *node, const value_type& val)
 		{
 			if (val.first < (node->_data).first)
 			{
@@ -724,8 +731,8 @@ namespace ft
 				{
 					node->_left = _node_allocator.allocate(1);
 					_node_allocator.construct(node->_left, MapNode<value_type>(val));
-					node->_left->_parent = node->_left;
-					return (ft::Pair<iterator, bool>(node, true));
+					node->_left->_parent = node;
+					return (ft::Pair<iterator, bool>(node->_left, true));
 				}
 				else
 				{
@@ -738,8 +745,8 @@ namespace ft
 				{
 					node->_right = _node_allocator.allocate(1);
 					_node_allocator.construct(node->_right, MapNode<value_type>(val));
-					node->_right->_parent = node->_right;
-					return (ft::Pair<iterator, bool>(node, true));
+					node->_right->_parent = node;
+					return (ft::Pair<iterator, bool>(node->_right, true));
 				}
 				else
 				{

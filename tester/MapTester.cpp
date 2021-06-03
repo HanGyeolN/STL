@@ -9,19 +9,37 @@ struct classcomp {
   {return lhs<rhs;}
 };
 
+template <typename T1, typename T2>
+void		show_map(const ft::Map<T1, T2> &map)
+{
+	typename ft::Map<T1,T2>::iterator	iter;
+
+	iter = map.begin();
+	while (iter != map.end())
+	{
+		std::cout << "key: " << (*iter).first << ", val: " << (*iter).second << '\n';
+		std::cout << "parent: " << iter._element->_parent << '\n';
+		std::cout << "left: " << iter._element->_left << "right: " << iter._element->_right << '\n';
+		++iter;
+	}
+}
+
 void		construct_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "CONSTRUCT" << std::endl;
 	ft::Map<char,int> first;
 
-	first['a']=10;
-	first['b']=30;
-	first['c']=50;
-	first['d']=70;
+	first['a'] = 10;
+	first['b'] = 30;
+	first['c'] = 50;
+	first['d'] = 70;
+	show_map(first);
 
 	ft::Map<char,int> second (first.begin(),first.end());
+	show_map(second);
 
 	ft::Map<char,int> third (second);
+	show_map(third);
 
 	//ft::Map<char,int,classcomp> fourth;                 // class as Compare
 

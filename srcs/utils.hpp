@@ -20,11 +20,11 @@ namespace ft
 
 		template <typename C1, typename C2>
 		Pair(const Pair<C1, C2> &copy) : first(copy.first), second(copy.second) {}
-		
-		Pair	&operator=(const Pair &ref)
+
+		Pair<T1, T2>	&operator=(const Pair<T1, T2> &ref)
 		{
-			this->first = ref.first;
-			this->second = ref.second;
+			first = ref.first;
+			second = ref.second;
 			return (*this);
 		}
 
