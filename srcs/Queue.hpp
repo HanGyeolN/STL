@@ -56,38 +56,37 @@ namespace ft
 
 		void			pop()
 		{
-			// _container.pop_front();
 			_container.erase(_container.begin());
 		}
 
 		friend bool operator== (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
-			return (lhs == rhs);
+			return (lhs._container == rhs._container);
 		}
 
 		friend bool operator!= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
-			return (lhs != rhs);
+			return (lhs._container != rhs._container);
 		}
 
 		friend bool operator<  (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
-			return (lhs < rhs);
+			return (lhs._container < rhs._container);
 		}
 
 		friend bool operator<= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
-			return (lhs <= rhs);
+			return (lhs._container <= rhs._container);
 		}
 
 		friend bool operator>  (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
-			return (lhs > rhs);
+			return (lhs._container > rhs._container);
 		}
 
 		friend bool operator>= (const Queue<T,Container>& lhs, const Queue<T,Container>& rhs)
 		{
-			return (lhs >= rhs);
+			return (lhs._container >= rhs._container);
 		}
 
 	private:

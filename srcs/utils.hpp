@@ -3,6 +3,67 @@
 
 namespace ft
 {
+	template <typename U>
+	void			swap(U &x, U &y)
+	{
+		U	temp;
+
+		temp = x;
+		x = y;
+		y = temp;
+	}
+
+	// 사전식 비교
+	template <class InputIterator1, class InputIterator2>
+	bool			lexicographical_compare ( InputIterator1 first1, InputIterator1 last1,
+											InputIterator2 first2, InputIterator2 last2)
+	{
+	while (first1 != last1)
+	{
+		if (first2 == last2 || *first2 < *first1)
+			return (false);
+		else if (*first1 < *first2)
+			return (true);
+		++first1;
+		++first2;
+	}
+	return (first2 != last2);
+	}
+
+	template <class InputIterator1, class InputIterator2>
+	bool			equal ( InputIterator1 first1, InputIterator1 last1, InputIterator2 first2 )
+	{
+		while (first1 != last1)
+		{
+			if (!(*first1 == *first2))   // or: if (!pred(*first1,*first2)), for version 2
+				return (false);
+			++first1;
+			++first2;
+		}
+		return (true);
+	}
+
+	// 함수 객체를 위해 타입을 정의한 객체
+	template <typename Arg1, typename Arg2, class Result>
+	class binary_function
+	{
+	public:
+		typedef Arg1	first_argument_type;
+		typedef Arg2	second_argument_type;
+		typedef Result	result_type;
+	};
+
+	// less 함수 객체
+	template <typename T>
+	class less : public binary_function <T, T, bool>
+	{
+	public:
+		bool operator() (const T& x, const T& y) const
+		{
+			return (x < y);
+		}
+	};
+
 	template <typename T1, typename T2>
 	class Pair
 	{

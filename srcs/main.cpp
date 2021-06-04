@@ -1,10 +1,16 @@
-#include <iostream>
-#include <iterator>
-#include "List.hpp"
+#include "VectorTester.hpp"
+#include "StackTester.hpp"
+#include "QueueTester.hpp"
+#include "ListTester.hpp"
+#include "MapTester.hpp"
 
 int     main()
 {
-    std::move_iterator	iter;
+    vector_tester::main();
+    stack_tester::main();
+    queue_tester::main();
+    list_tester::main();
+    map_tester::main();
 
     return (0);
 }

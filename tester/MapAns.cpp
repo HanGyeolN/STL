@@ -9,15 +9,30 @@ struct classcomp {
   {return lhs<rhs;}
 };
 
+// template <typename T1, typename T2>
+// void		show_map(const std::map<T1, T2> &map)
+// {
+// 	typename std::map<T1,T2>::iterator	iter;
+
+// 	iter = map.begin();
+// 	while (iter != map.end())
+// 	{
+// 		std::cout << "key: " << (*iter).first << ", val: " << (*iter).second << '\n';
+// 		// std::cout << "parent: " << iter._element->_parent << '\n';
+// 		// std::cout << "left: " << iter._element->_left << "right: " << iter._element->_right << '\n';
+// 		++iter;
+// 	}
+// }
+
 void		construct_test()
 {
 	std::cout << std::setfill('-') << std::setw(20) << "CONSTRUCT" << std::endl;
 	std::map<char,int> first;
 
-	first['a']=10;
-	first['b']=30;
-	first['c']=50;
-	first['d']=70;
+	first['a'] = 10;
+	first['b'] = 30;
+	first['c'] = 50;
+	first['d'] = 70;
 
 	std::map<char,int> second (first.begin(),first.end());
 
@@ -366,23 +381,23 @@ void		range_test()
 int main(void)
 {
 	construct_test();
-	// copy_operator_test();
-	// begin_test();
-	// rbegin_test();
-	// empty_test();
-	// size_test();
-	// max_size_test();
-	// operator_test();
-	// insert_test();
-	// erase_test();
-	// swap_test();
-	// clear_test();
-	// key_compare_test();
-	// value_compare_test();
-	// find_test();
-	// count_test();
-	// bound_test();
-	// range_test();
+	copy_operator_test();
+	begin_test();
+	rbegin_test();
+	empty_test();
+	size_test();
+	max_size_test();
+	operator_test();
+	insert_test();
+	erase_test();
+	swap_test();
+	clear_test();
+	key_compare_test();
+	value_compare_test();
+	find_test();
+	count_test();
+	bound_test();
+	range_test();
 
 	return (0);
 }

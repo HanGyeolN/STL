@@ -64,6 +64,43 @@ public:
 
 	ReverseMapIterator<T>		&operator++()
 	{
+		if (this->_element->_left)
+		{
+			this->_element = this->_element->_left;
+			while (this->_element->_right)
+				this->_element = this->_element->_right;
+		}
+		else
+		{
+			while (this->_element->_parent && this->_element->_parent->_left == this->_element)
+				this->_element = this->_element->_parent;
+			this->_element = this->_element->_parent;
+		}
+		return (*this);
+	}
+
+
+	ReverseMapIterator<T>		operator++(int)
+	{
+		ReverseMapIterator<T>	tmp(*this);
+
+		if (this->_element->_left)
+		{
+			this->_element = this->_element->_left;
+			while (this->_element->_right)
+				this->_element = this->_element->_right;
+		}
+		else
+		{
+			while (this->_element->_parent && this->_element->_parent->_left == this->_element)
+				this->_element = this->_element->_parent;
+			this->_element = this->_element->_parent;
+		}
+		return (tmp);
+	}
+	
+	ReverseMapIterator<T>		&operator--()
+	{
 		if (this->_element->_right)
 		{
 			this->_element = this->_element->_right;
@@ -79,7 +116,7 @@ public:
 		return (*this);
 	}
 
-	ReverseMapIterator<T>		operator++(int)
+	ReverseMapIterator<T>		operator--(int)
 	{
 		ReverseMapIterator<T>	tmp(*this);
 		
@@ -92,42 +129,6 @@ public:
 		else
 		{
 			while (this->_element->_parent && this->_element->_parent->_right == this->_element)
-				this->_element = this->_element->_parent;
-			this->_element = this->_element->_parent;
-		}
-		return (tmp);
-	}
-	
-	ReverseMapIterator<T>		&operator--()
-	{
-		if (this->_element->_left)
-		{
-			this->_element = this->_element->_left;
-			while (this->_element->_right)
-				this->_element = this->_element->_right;
-		}
-		else
-		{
-			while (this->_element->_parent && this->_element->_parent->_left == this->_element)
-				this->_element = this->_element->_parent;
-			this->_element = this->_element->_parent;
-		}
-		return (*this);
-	}
-
-	ReverseMapIterator<T>		operator--(int)
-	{
-		ReverseMapIterator<T>	tmp(*this);
-
-		if (this->_element->_left)
-		{
-			this->_element = this->_element->_left;
-			while (this->_element->_right)
-				this->_element = this->_element->_right;
-		}
-		else
-		{
-			while (this->_element->_parent && this->_element->_parent->_left == this->_element)
 				this->_element = this->_element->_parent;
 			this->_element = this->_element->_parent;
 		}

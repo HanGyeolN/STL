@@ -1,8 +1,6 @@
 #ifndef MAP_HPP
 # define MAP_HPP
 
-#include <iostream>
-
 # include <memory>
 # include "MapNode.hpp"
 # include "MapIterator.hpp"
@@ -11,17 +9,8 @@
 
 namespace ft
 {
-	template <typename U>
-	void	swap(U& a, U& b)
-	{
-		U		temp;
 
-		temp = a;
-		a = b;
-		b = temp;
-	}
-
-	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::Pair<Key, T> > >
+	template < class Key, class T, class Compare = ft::less<Key>, class Alloc = std::allocator<ft::Pair<Key, T> > >
 	class Map
 	{
 
@@ -31,7 +20,7 @@ namespace ft
 		typedef	ft::Pair<key_type, mapped_type>		value_type;
 		typedef Compare										key_compare;
 
-		class value_compare : std::binary_function<value_type, value_type, bool>
+		class value_compare : ft::binary_function<value_type, value_type, bool>
 		{
 			friend class Map<key_type, mapped_type, key_compare, Alloc>;
 			
@@ -139,7 +128,8 @@ namespace ft
 
 		Map& operator=(const Map& x)
 		{
-			this->clear();
+			if (_root != 0)
+				this->clear();
 			this->insert(x.begin(), x.end());
 			return (*this);
 		}
@@ -148,6 +138,8 @@ namespace ft
 		{
 			iterator			begin(_root);
 
+			if (_root == 0)
+				return (0);
 			while (begin._element->_left)
 			{
 				begin._element = begin._element->_left;
@@ -159,6 +151,8 @@ namespace ft
 		{
 			node_pointer		begin;
 
+			if (_root == 0)
+				return (0);
 			begin = _root;
 			while (begin->_left)
 			{
@@ -181,6 +175,8 @@ namespace ft
 		{
 			node_pointer		end;
 
+			if (_root == 0)
+				return (0);
 			end = _root;
 			while (end->_right)
 			{
@@ -193,6 +189,8 @@ namespace ft
 		{
 			node_pointer		end;
 
+			if (_root == 0)
+				return (0);
 			end = _root;
 			while (end->_right)
 			{
@@ -224,6 +222,8 @@ namespace ft
 			iterator		iter;
 			size_type		i;
 
+			if (_root == 0)
+				return (0);
 			i = 0;
 			iter = begin();
 			while (iter != end())
@@ -273,10 +273,10 @@ namespace ft
 				if (target._element)
 					return (target->second);
 				else
-					return ((insert(value_type(k, 0)).first)->second);
+					return ((insert(value_type(k, mapped_type())).first)->second);
 			}
 			else
-				return ((insert(value_type(k, 0)).first)->second);
+				return ((insert(value_type(k, mapped_type())).first)->second);
 		}
 
 // Insert elements

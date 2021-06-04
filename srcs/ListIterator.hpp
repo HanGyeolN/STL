@@ -9,6 +9,7 @@ class ListIterator
 {
 public:
 	Node<T>			*_element;
+	
 public:
 	typedef typename Iterator<bidirectional_iterator_tag, T>::iterator_category	iterator_category;
 	typedef typename Iterator<bidirectional_iterator_tag, T>::value_type		value_type;

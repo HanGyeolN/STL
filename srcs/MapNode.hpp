@@ -6,9 +6,9 @@ class MapNode
 {
 public:
 	T			_data;
-	MapNode*	_parent;
-	MapNode*	_left;
-	MapNode*	_right;
+	MapNode<T>*	_parent;
+	MapNode<T>*	_left;
+	MapNode<T>*	_right;
 
 	MapNode() : _data(0), _parent(0), _left(0), _right(0)
 	{
